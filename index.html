@@ -5,11 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Eye Condition Classifier - YOLO11n-cls</title>
     <link rel="stylesheet" href="styles.css">
-    <!-- TensorFlow.js -->
     <script src="https://cdn.jsdelivr.net/npm/@tensorflow/tfjs@latest/dist/tf.min.js"></script>
-    <!-- TFLite Web API -->
-    <script src="https://cdn.jsdelivr.net/npm/@tensorflow/tfjs-tflite@0.0.1-alpha.8/dist/tf-tflite.min.js"></script>
-    <!-- WebAssembly backend -->
     <script src="https://cdn.jsdelivr.net/npm/@tensorflow/tfjs-backend-wasm@latest/dist/tf-backend-wasm.min.js"></script>
 </head>
 <body>
@@ -18,7 +14,7 @@
     </header>
     <main>
         <input type="file" id="imageInput" accept="image/*">
-        <p id="result">Upload an eye image to classify.</p>
+        <p id="result" style="color: red;">Upload an eye image to classify.</p>
         <canvas id="preview" style="display: none;"></canvas>
     </main>
     <script src="script.js"></script>
