@@ -1,0 +1,820 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Awards Timeline - Photo Stack</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            background-color: #000;
+            color: #fff;
+            font-family: 'Arial', sans-serif;
+            overflow-x: hidden;
+        }
+
+        .awards-section {
+            height: 500vh; /* Extended height for scroll effect */
+            position: relative;
+            background: #000;
+        }
+
+        .awards-container {
+            position: sticky;
+            top: 0;
+            height: 100vh;
+            overflow: hidden;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 0 50px;
+        }
+
+        .section-title {
+            position: absolute;
+            top: 70px;
+            left: 50%;
+            transform: translateX(-50%);
+            font-size: 2.5rem;
+            font-weight: bold;
+            color: #fff;
+            z-index: 100;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.8);
+            letter-spacing: 2px;
+            text-align: center;
+        }
+
+        .timeline-wrapper {
+            width: 100%;
+            height: 100%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+            perspective: 1000px;
+        }
+
+        /* Remove timeline line and its dots */
+        .timeline-line {
+            display: none;
+        }
+
+        .awards-stack {
+            position: relative;
+            width: 400px;
+            height: 500px;
+            transform-style: preserve-3d;
+        }
+
+        .award-card {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            background: rgba(20, 20, 20, 0.15); /* Transparent background */
+            border: none;
+            border-radius: 15px;
+            padding: 40px 30px;
+            text-align: center;
+            transition: all 0.6s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+            cursor: pointer;
+            transform-origin: center center;
+            box-shadow: 
+                0 10px 30px rgba(0, 0, 0, 0.8),
+                inset 0 1px 0 rgba(255, 255, 255, 0),
+                inset 0 -1px 0 rgba(0, 0, 0, 0.5);
+            backdrop-filter: blur(10px);
+            overflow: hidden;
+            opacity: 0;
+            pointer-events: none;
+            z-index: 1;
+            filter: blur(2px);
+        }
+
+        .award-card.visible {
+            opacity: 1;
+            pointer-events: auto;
+            filter: none;
+        }
+
+        .award-card::before {
+            content: '';
+            position: absolute;
+            top: -2px;
+            left: -2px;
+            right: -2px;
+            bottom: -2px;
+            background: transparent;
+            border-radius: 15px;
+            pointer-events: none;
+            z-index: -1;
+        }
+
+        .award-card .card-particles {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            border-radius: 15px;
+            overflow: hidden;
+        }
+
+        .award-card.active {
+            transform: translateZ(50px) scale(1.05);
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.9);
+            z-index: 10;
+        }
+
+        .award-card.prev1 {
+            transform: translateX(-120px) translateZ(-20px) rotateY(15deg) scale(0.95);
+            opacity: 0.8;
+            z-index: 7;
+        }
+
+        .award-card.prev2 {
+            transform: translateX(-240px) translateZ(-40px) rotateY(25deg) scale(0.9);
+            opacity: 0.5;
+            z-index: 5;
+            filter: blur(1px);
+        }
+
+        .award-card.next1 {
+            transform: translateX(120px) translateZ(-20px) rotateY(-15deg) scale(0.95);
+            opacity: 0.8;
+            z-index: 7;
+        }
+
+        .award-card.next2 {
+            transform: translateX(240px) translateZ(-40px) rotateY(-25deg) scale(0.9);
+            opacity: 0.5;
+            z-index: 5;
+            filter: blur(1px);
+        }
+
+        /* Hide all other cards */
+        .award-card.stack-far {
+            opacity: 0;
+            pointer-events: none;
+            z-index: 1;
+            filter: blur(2px);
+        }
+
+        .award-icon {
+            width: 140px;
+            height: 110px;
+            margin: 0 auto 24px;
+            border-radius: 10px;
+            box-shadow: 0 12px 40px 0 rgba(255,255,255,0.28), 0 4px 16px rgba(255,255,255,0.15);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            overflow: hidden;
+            background: transparent;
+        }
+
+        .award-icon img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover; /* Ensures image fills without distortion */
+            border-radius: 10px;
+            box-shadow: 0 0 40px 10px rgba(255,255,255,0.38);
+        }
+
+        .award-card.active .award-icon {
+            box-shadow: 0 12px 40px 0 rgba(255,255,255,0.35), 0 4px 16px rgba(255,255,255,0.18);
+            transform: scale(1.05);
+        }
+
+        .award-date {
+            color: #bbb;
+            font-size: 0.9rem;
+            font-weight: bold;
+            margin-bottom: 15px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            border-bottom: 1px solid #333;
+            padding-bottom: 10px;
+        }
+
+        .award-card.active .award-date {
+            color: #fff;
+        }
+
+        .award-title {
+            font-size: 1.4rem;
+            font-weight: bold;
+            margin-bottom: 15px;
+            color: #fff;
+            line-height: 1.3;
+        }
+
+        .award-event {
+            color: #999;
+            font-size: 1rem;
+            font-weight: 600;
+            margin-bottom: 20px;
+            line-height: 1.4;
+        }
+
+        .award-card.active .award-event {
+            color: #ccc;
+        }
+
+        .award-description {
+            color: #777;
+            font-size: 0.9rem;
+            line-height: 1.6;
+            margin-bottom: 15px;
+        }
+
+        .award-card.active .award-description {
+            color: #aaa;
+        }
+
+        .award-value {
+            color: #fff;
+            font-weight: bold;
+            margin-top: 15px;
+            padding: 10px;
+            border-radius: 8px;
+            background: rgba(255, 255, 255, 0.05);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .award-card.active .award-value {
+            background: rgba(255, 255, 255, 0.1);
+        }
+
+        /* Card particle system */
+        .card-particle {
+            position: absolute;
+            width: 2px;
+            height: 2px;
+            background: #fff;
+            border-radius: 50%;
+            opacity: 0.6;
+            animation: cardParticleFloat 3s ease-in-out infinite;
+        }
+
+        @keyframes cardParticleFloat {
+            0%, 100% { 
+                opacity: 0.3;
+                transform: scale(0.8);
+            }
+            50% { 
+                opacity: 0.8;
+                transform: scale(1.2);
+            }
+        }
+
+        /* Progress indicator */
+        .progress-indicator {
+            position: absolute;
+            bottom: 50px;
+            left: 50%;
+            transform: translateX(-50%);
+            display: flex;
+            gap: 10px;
+            z-index: 50;
+        }
+
+        .progress-dot {
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+            background: #333;
+            border: 1px solid #555;
+            transition: all 0.3s ease;
+            cursor: pointer;
+        }
+
+        .progress-dot.active {
+            background: #fff;
+            border-color: #fff;
+            transform: scale(1.2);
+        }
+
+        /* Noise texture overlay */
+        .noise-overlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            opacity: 0.03;
+            pointer-events: none;
+            background-image: 
+                radial-gradient(circle at 25% 25%, #fff 1px, transparent 1px),
+                radial-gradient(circle at 75% 75%, #fff 1px, transparent 1px);
+            background-size: 100px 100px;
+            background-position: 0 0, 50px 50px;
+            animation: noiseMove 20s linear infinite;
+        }
+
+        @keyframes noiseMove {
+            0% { transform: translate(0, 0); }
+            100% { transform: translate(100px, 100px); }
+        }
+
+        /* Navigation hints */
+        .nav-hint {
+            position: absolute;
+            bottom: 120px;
+            left: 50%;
+            transform: translateX(-50%);
+            color: #666;
+            font-size: 0.8rem;
+            text-align: center;
+            z-index: 50;
+        }
+
+        /* Arrow styles */
+        .awards-arrows {
+            position: absolute;
+            top: 50%;
+            left: 0;
+            right: 0;
+            z-index: 100;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            pointer-events: none;
+            height: 0;
+        }
+
+        .arrow-btn {
+            pointer-events: auto;
+            background: rgba(255,255,255,0.12);
+            border: none;
+            border-radius: 50%;
+            width: 44px;
+            height: 44px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 2px 12px rgba(0,0,0,0.18);
+            cursor: pointer;
+            transition: background 0.2s;
+        }
+
+        .arrow-btn:hover {
+            background: rgba(255,255,255,0.25);
+        }
+
+        .arrow-btn svg {
+            width: 28px;
+            height: 28px;
+            fill: #fff;
+        }
+
+        .youtube-badge {
+            position: absolute;
+            left: 10px;
+            top: 50%;
+            transform: translateY(-50%);
+            z-index: 2;
+            background: rgba(0,0,0,0.12);
+            border-radius: 50%;
+            padding: 2px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.18);
+            transition: box-shadow 0.2s;
+        }
+
+        .award-icon a:hover .youtube-badge {
+            box-shadow: 0 4px 16px rgba(255,0,0,0.25);
+        }
+
+        /* Responsive design */
+        @media (max-width: 768px) {
+            .section-title {
+                font-size: 2rem;
+                top: 30px;
+                left: 50%;
+                transform: translateX(-50%);
+                text-align: center;
+            }
+
+            .awards-container {
+                padding: 0 20px;
+            }
+
+            .awards-stack {
+                width: 320px;
+                height: 450px;
+            }
+
+            .award-card {
+                padding: 30px 20px;
+            }
+
+            .award-title {
+                font-size: 1.2rem;
+            }
+
+            .award-card.prev2,
+            .award-card.next2 {
+                display: none;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="noise-overlay"></div>
+    
+    <div class="awards-section">
+        <div class="awards-container">
+            <h2 class="section-title">AWARDS & ACHIEVEMENTS</h2>
+            
+            <div class="timeline-wrapper">
+                <!-- <div class="timeline-line"></div> --> <!-- Remove this line -->
+                <div class="awards-arrows">
+                    <button class="arrow-btn" id="arrowPrev" aria-label="Previous award">
+                        <svg viewBox="0 0 24 24"><path d="M15.5 19l-7-7 7-7"/></svg>
+                    </button>
+                    <button class="arrow-btn" id="arrowNext" aria-label="Next award">
+                        <svg viewBox="0 0 24 24"><path d="M8.5 5l7 7-7 7"/></svg>
+                    </button>
+                </div>
+                <div class="awards-stack" id="awardsStack">
+                    
+                    <div class="award-card" data-index="0">
+                        <div class="card-particles"></div>
+                        <div class="award-icon">
+                            <img src="assets/ieee.jpeg" alt="IEEE Competition">
+                        </div>
+                        <div class="award-date">June 2025</div>
+                        <div class="award-title">Best Innovative Idea</div>
+                        <div class="award-event">IEEE Zewail City APPX Competition, Egypt</div>
+                        <div class="award-description">Pollibotics project recognized for innovative AI robotic pollinator technology for vertical farms</div>
+                    </div>
+
+                    <div class="award-card" data-index="1">
+                        <div class="card-particles"></div>
+                        <div class="award-icon">
+                            <img src="assets/women.jpeg" alt="Cairo University Conference">
+                        </div>
+                        <div class="award-date">March 2025</div>
+                        <div class="award-title">1st Place Award</div>
+                        <div class="award-event">Role of Women in Science Conference, Cairo University</div>
+                        <div class="award-description">RoboDoc5 AI diagnostic tool achieved first place recognition for medical innovation</div>
+                    </div>
+
+                    <div class="award-card" data-index="2">
+                        <div class="card-particles"></div>
+                        <div class="award-icon">
+                            <img src="assets/creativia.png" alt="Smart Industry Hackathon">
+                        </div>
+                        <div class="award-date">March 2025</div>
+                        <div class="award-title">1st Place Winner</div>
+                        <div class="award-event">Smart Industry Hackathon 5.0, Egypt</div>
+                        <div class="award-description">RoboDoc5 won first place with substantial prize for smart healthcare innovation</div>
+                        <div class="award-value">Prize: 20,000 EGP</div>
+                    </div>
+
+                    <div class="award-card" data-index="3">
+                        <div class="card-particles"></div>
+                        <div class="award-icon">
+                            <img src="assets/leap2.jpeg" alt="LEAP 2025 Riyadh">
+                        </div>
+                        <div class="award-date">February 2025</div>
+                        <div class="award-title">Semi-Finalist & Exhibitor</div>
+                        <div class="award-event">LEAP 2025 Rocket Fuel, Riyadh, KSA</div>
+                        <div class="award-description">Pollibotics reached semi-finals in prestigious international startup competition</div>
+                    </div>
+
+                    <div class="award-card" data-index="4">
+                        <div class="card-particles"></div>
+                        <div class="award-icon">
+                            <img src="assets/aidc.jpeg" alt="Al Azhar Dental Conference">
+                        </div>
+                        <div class="award-date">February 2025</div>
+                        <div class="award-title">2nd Place Award</div>
+                        <div class="award-event">Al Azhar International Dental Conference, Egypt</div>
+                        <div class="award-description">RoboDoc5 received second place for dental diagnostic applications</div>
+                    </div>
+
+                    <div class="award-card" data-index="5">
+                        <div class="card-particles"></div>
+                        <div class="award-icon" style="position: relative;">
+                            <a href="https://youtu.be/mc5CbZx5E_4?si=ydFJVQcZ-IC2Pt3E" target="_blank" rel="noopener" title="GenZ TV Funding Video">
+                                <!-- Youtube badge/icon -->
+                                <span class="youtube-badge" style="position: absolute; left: 0; top: 15%; transform: translateY(-50%);">
+                                    <svg width="28" height="28" viewBox="0 0 28 28" fill="none">
+                                        <circle cx="14" cy="14" r="13" fill="#FF0000" stroke="#FF0000" stroke-width="2"/>
+                                        <polygon points="11,9 21,14 11,19" fill="#fff"/>
+                                    </svg>
+                                </span>
+                                <img src="assets/genz.png" alt="GenZ TV Funding">
+                            </a>
+                        </div>
+                        <div class="award-date">January 2025</div>
+                        <div class="award-title">Funding Winner</div>
+                        <div class="award-event">GenZ TV Funding, Egypt</div>
+                        <div class="award-description">RoboDoc4 secured major funding for continued development and scaling</div>
+                        <div class="award-value">Funding: 500,000 EGP</div>
+                    </div>
+
+                    <div class="award-card" data-index="6">
+                        <div class="card-particles"></div>
+                        <div class="award-icon">
+                            <img src="assets/ict.jpeg" alt="Cairo ICT Forum">
+                        </div>
+                        <div class="award-date">December 2024</div>
+                        <div class="award-title">Invited to Exhibit</div>
+                        <div class="award-event">Cairo International Technology Forum ICT24, Egypt</div>
+                        <div class="award-description">RoboDoc4 selected for exhibition at premier technology showcase</div>
+                    </div>
+
+                    <div class="award-card" data-index="7">
+                        <div class="card-particles"></div>
+                        <div class="award-icon">
+                            <img src="assets/beko.jpeg" alt="Prime Minister Presentation">
+                        </div>
+                        <div class="award-date">October 2024</div>
+                        <div class="award-title">Presented to Prime Minister</div>
+                        <div class="award-event">Beko Factory Grand Opening, Egypt</div>
+                        <div class="award-description">Oxygreen algae-based CO2 reduction system presented at high-level government event</div>
+                    </div>
+
+                    <div class="award-card" data-index="8">
+                        <div class="card-particles"></div>
+                        <div class="award-icon">
+                            <img src="assets/nu.jpeg" alt="UGRF Competition">
+                        </div>
+                        <div class="award-date">September 2024</div>
+                        <div class="award-title">1st Place (Sustainability) & 2nd Place (Beko)</div>
+                        <div class="award-event">18th UGRF Competition, Egypt</div>
+                        <div class="award-description">Oxygreen won dual awards for sustainability innovation and overall excellence</div>
+                    </div>
+
+                    <div class="award-card" data-index="9">
+                        <div class="card-particles"></div>
+                        <div class="award-icon">
+                            <img src="assets/isf.jpeg" alt="MSA Startup Olympics">
+                        </div>
+                        <div class="award-date">August 2024</div>
+                        <div class="award-title">2nd Place Award</div>
+                        <div class="award-event">MSA-ISF Startup Olympics, Egypt</div>
+                        <div class="award-description">RoboDoc3 achieved second place in university startup competition</div>
+                    </div>
+
+                    <div class="award-card" data-index="10">
+                        <div class="card-particles"></div>
+                        <div class="award-icon">
+                            <img src="assets/sole.jpeg" alt="Sole Entrepreneurship Competition">
+                        </div>
+                        <div class="award-date">February 2024</div>
+                        <div class="award-title">2nd Place Award</div>
+                        <div class="award-event">Sole Entrepreneurship Competition, Egypt</div>
+                        <div class="award-description">RoboDoc2 earned second place in early-stage entrepreneurship competition</div>
+                    </div>
+
+                </div>
+            </div>
+
+            <div class="progress-indicator" id="progressIndicator"></div>
+            <div class="nav-hint">Scroll through awards</div>
+        </div>
+    </div>
+
+    <script>
+        class AwardsTimeline {
+            constructor() {
+                this.awards = document.querySelectorAll('.award-card');
+                this.totalAwards = this.awards.length;
+                this.currentIndex = 0;
+                this.progressIndicator = document.getElementById('progressIndicator');
+                
+                this.init();
+            }
+
+            init() {
+                this.createProgressDots();
+                this.createCardParticlesOnce();
+                this.updateStack();
+                this.bindEvents();
+            }
+
+            createCardParticlesOnce() {
+                this.awards.forEach((card, index) => {
+                    const particleContainer = card.querySelector('.card-particles');
+                    if (particleContainer.childElementCount === 0) { // Only if not already generated
+                        const particles = this.generateCardEdgeParticles(400, 500, 8); // Fewer particles for performance
+                        particles.forEach(particle => {
+                            const dot = document.createElement('div');
+                            dot.className = 'card-particle';
+                            dot.style.left = particle.x + 'px';
+                            dot.style.top = particle.y + 'px';
+                            dot.style.animationDelay = Math.random() * 3 + 's';
+                            dot.style.animationDuration = (2 + Math.random() * 2) + 's';
+                            particleContainer.appendChild(dot);
+                        });
+                    }
+                });
+            }
+
+            generateCardEdgeParticles(width, height, particleSpacing = 4) {
+                const particles = [];
+                const cornerRadius = 15;
+                
+                // Top edge
+                for (let x = cornerRadius; x < width - cornerRadius; x += particleSpacing) {
+                    if (Math.random() < 0.9) { // More particles
+                        particles.push({ x: x + (Math.random() - 0.5) * 2, y: 2 + (Math.random() - 0.5) * 2 });
+                    }
+                }
+                // Bottom edge
+                for (let x = cornerRadius; x < width - cornerRadius; x += particleSpacing) {
+                    if (Math.random() < 0.9) {
+                        particles.push({ x: x + (Math.random() - 0.5) * 2, y: height - 2 + (Math.random() - 0.5) * 2 });
+                    }
+                }
+                // Left edge
+                for (let y = cornerRadius; y < height - cornerRadius; y += particleSpacing) {
+                    if (Math.random() < 0.9) {
+                        particles.push({ x: 2 + (Math.random() - 0.5) * 2, y: y + (Math.random() - 0.5) * 2 });
+                    }
+                }
+                // Right edge
+                for (let y = cornerRadius; y < height - cornerRadius; y += particleSpacing) {
+                    if (Math.random() < 0.9) {
+                        particles.push({ x: width - 2 + (Math.random() - 0.5) * 2, y: y + (Math.random() - 0.5) * 2 });
+                    }
+                }
+                // Corner particles (rounded corners)
+                const corners = [
+                    { cx: cornerRadius, cy: cornerRadius, startAngle: Math.PI, endAngle: 1.5 * Math.PI },
+                    { cx: width - cornerRadius, cy: cornerRadius, startAngle: 1.5 * Math.PI, endAngle: 2 * Math.PI },
+                    { cx: width - cornerRadius, cy: height - cornerRadius, startAngle: 0, endAngle: 0.5 * Math.PI },
+                    { cx: cornerRadius, cy: height - cornerRadius, startAngle: 0.5 * Math.PI, endAngle: Math.PI }
+                ];
+                corners.forEach(corner => {
+                    const angleStep = 0.1; // More corner particles
+                    for (let angle = corner.startAngle; angle < corner.endAngle; angle += angleStep) {
+                        if (Math.random() < 0.8) {
+                            const x = corner.cx + Math.cos(angle) * cornerRadius;
+                            const y = corner.cy + Math.sin(angle) * cornerRadius;
+                            particles.push({ 
+                                x: x + (Math.random() - 0.5) * 2, 
+                                y: y + (Math.random() - 0.5) * 2 
+                            });
+                        }
+                    }
+                });
+                return particles;
+            }
+
+            createProgressDots() {
+                for (let i = 0; i < this.totalAwards; i++) {
+                    const dot = document.createElement('div');
+                    dot.className = 'progress-dot';
+                    dot.addEventListener('click', () => this.goToAward(i));
+                    this.progressIndicator.appendChild(dot);
+                }
+            }
+
+            updateStack() {
+                this.awards.forEach((card, index) => {
+                    card.className = 'award-card';
+
+                    // Calculate positions with looping
+                    const total = this.totalAwards;
+                    const idx = this.currentIndex;
+
+                    // Get relative position with wrap-around
+                    let rel = (index - idx + total) % total;
+                    if (rel === 0) {
+                        card.classList.add('active', 'visible');
+                    } else if (rel === 1) {
+                        card.classList.add('next1', 'visible');
+                    } else if (rel === 2) {
+                        card.classList.add('next2', 'visible');
+                    } else if (rel === total - 1) {
+                        card.classList.add('prev1', 'visible');
+                    } else if (rel === total - 2) {
+                        card.classList.add('prev2', 'visible');
+                    } else {
+                        card.classList.add('stack-far');
+                    }
+                });
+
+                // Update progress dots
+                document.querySelectorAll('.progress-dot').forEach((dot, index) => {
+                    dot.classList.toggle('active', index === this.currentIndex);
+                });
+            }
+
+            goToAward(index) {
+                this.currentIndex = (index + this.totalAwards) % this.totalAwards;
+                this.updateStack();
+            }
+
+            next() {
+                this.currentIndex = (this.currentIndex + 1) % this.totalAwards;
+                this.updateStack();
+            }
+
+            prev() {
+                this.currentIndex = (this.currentIndex - 1 + this.totalAwards) % this.totalAwards;
+                this.updateStack();
+            }
+
+            bindEvents() {
+                // Scroll navigation
+                let ticking = false;
+                const section = document.querySelector('.awards-section');
+                
+                window.addEventListener('scroll', () => {
+                    if (!ticking) {
+                        requestAnimationFrame(() => {
+                            const scrollTop = window.pageYOffset;
+                            const sectionTop = section.offsetTop;
+                            const sectionHeight = section.offsetHeight;
+                            
+                            if (scrollTop >= sectionTop && scrollTop <= sectionTop + sectionHeight) {
+                                const scrollProgress = (scrollTop - sectionTop) / (sectionHeight - window.innerHeight);
+                                // Smoothly interpolate index
+                                const targetIndex = Math.round(scrollProgress * (this.totalAwards - 1));
+                                if (targetIndex !== this.currentIndex && targetIndex >= 0 && targetIndex < this.totalAwards) {
+                                    this.goToAward(targetIndex);
+                                }
+                            }
+                            ticking = false;
+                        });
+                        ticking = true;
+                    }
+                });
+
+                // Keyboard navigation
+                document.addEventListener('keydown', (e) => {
+                    if (e.key === 'ArrowLeft' || e.key === 'ArrowUp') {
+                        e.preventDefault();
+                        this.prev();
+                    } else if (e.key === 'ArrowRight' || e.key === 'ArrowDown') {
+                        e.preventDefault();
+                        this.next();
+                    }
+                });
+
+                // Touch/swipe support
+                let startY = 0;
+                let startX = 0;
+                
+                document.addEventListener('touchstart', (e) => {
+                    startY = e.touches[0].clientY;
+                    startX = e.touches[0].clientX;
+                });
+
+                document.addEventListener('touchend', (e) => {
+                    const endY = e.changedTouches[0].clientY;
+                    const endX = e.changedTouches[0].clientX;
+                    const diffY = startY - endY;
+                    const diffX = startX - endX;
+
+                    if (Math.abs(diffY) > Math.abs(diffX) && Math.abs(diffY) > 50) {
+                        if (diffY > 0) {
+                            this.next();
+                        } else {
+                            this.prev();
+                        }
+                    }
+                });
+
+                // Click on cards
+                this.awards.forEach((card, index) => {
+                    card.addEventListener('click', () => {
+                        if (index !== this.currentIndex) {
+                            this.goToAward(index);
+                        }
+                    });
+                });
+
+                // Arrow navigation
+                document.getElementById('arrowPrev').addEventListener('click', (e) => {
+                    e.preventDefault();
+                    this.prev();
+                });
+                document.getElementById('arrowNext').addEventListener('click', (e) => {
+                    e.preventDefault();
+                    this.next();
+                });
+            }
+        }
+
+        // Initialize when DOM is loaded
+        document.addEventListener('DOMContentLoaded', () => {
+            new AwardsTimeline();
+        });
+    </script>
+</body>
+</html>
