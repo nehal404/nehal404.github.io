@@ -72,7 +72,7 @@
             }
             #particleCanvas {
                 left: 0;
-                top: -20vh; /* Moved up more */
+                top: 0;
                 width: 100vw;
                 height: 100vh;
             }
@@ -246,16 +246,27 @@
                 this.canvas.height = window.innerHeight || 1080;
             }
 
+            getTextPosition() {
+                const isMobile = window.innerWidth <= 768;
+                // Unified font size calculation for both particle creation and glow text
+                const fontSize = isMobile ? 
+                    Math.min(this.canvas.width / 6, 120) :  // Consistent mobile sizing
+                    Math.min(this.canvas.width / 8, 120);
+                
+                const textX = this.canvas.width / 2;
+                const textY = isMobile ? 
+                    this.canvas.height / 2 - 150 :  // Consistent positioning
+                    this.canvas.height / 2 - 100;
+                
+                return { textX, textY, fontSize };
+            }
+
             createTextParticles() {
                 const text = 'NEHAL ALAA';
                 const canvasWidth = this.canvas.width || window.innerWidth || 1920;
                 const canvasHeight = this.canvas.height || window.innerHeight || 1080;
                 
-                // Larger font size on mobile
-                const isMobile = window.innerWidth <= 768;
-                const fontSize = isMobile ? 
-                    Math.min(canvasWidth / 5, 150) :  // Larger on mobile
-                    Math.min(canvasWidth / 8, 120);
+                const { textX, textY, fontSize } = this.getTextPosition();
                 
                 const tempCanvas = document.createElement('canvas');
                 const tempCtx = tempCanvas.getContext('2d');
@@ -272,12 +283,6 @@
                 tempCtx.font = `1000 ${fontSize}px Arial`;
                 tempCtx.textAlign = 'center';
                 tempCtx.textBaseline = 'middle';
-                
-                const textX = tempCanvas.width / 2;
-                // Adjusted Y position for mobile - moved up more
-                const textY = isMobile ? 
-                    tempCanvas.height / 2 - 200 :  // Higher up on mobile
-                    tempCanvas.height / 2 - 100;
                 
                 tempCtx.fillText(text, textX, textY);
                 
@@ -399,15 +404,7 @@
 
             drawGlowingText() {
                 const text = 'NEHAL ALAA';
-                const isMobile = window.innerWidth <= 768;
-                const fontSize = isMobile ? 
-                    Math.min(this.canvas.width / 7, 130) : 
-                    Math.min(this.canvas.width / 8, 120);
-                
-                const textX = this.canvas.width / 2;
-                const textY = isMobile ? 
-                    this.canvas.height / 2 - 110 : 
-                    this.canvas.height / 2 - 100;
+                const { textX, textY, fontSize } = this.getTextPosition();
 
                 this.ctx.save();
                 this.ctx.font = `1000 ${fontSize}px Arial`;
