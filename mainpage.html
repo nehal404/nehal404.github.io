@@ -296,32 +296,34 @@
                 this.canvas.width = window.innerWidth || 1920;
                 this.canvas.height = window.innerHeight || 1080;
             }
-
             createTextParticles() {
                 const text = 'NEHAL ALAA';
                 const canvasWidth = this.canvas.width || window.innerWidth || 1920;
                 const canvasHeight = this.canvas.height || window.innerHeight || 1080;
-                const fontSize = Math.min(canvasWidth / 8, 120);
-                
+                const isMobile = canvasWidth <= 768;
+                const fontSize = isMobile ? Math.min(canvasWidth / 5, 56) : Math.min(canvasWidth / 8, 120);
+            
                 const tempCanvas = document.createElement('canvas');
                 const tempCtx = tempCanvas.getContext('2d');
-                
+            
                 tempCanvas.width = canvasWidth;
                 tempCanvas.height = canvasHeight;
-                
+            
                 if (tempCanvas.width === 0 || tempCanvas.height === 0) {
                     console.warn('Canvas dimensions are 0, skipping particle creation');
                     return;
                 }
-                
+            
                 tempCtx.fillStyle = '#ffffff';
                 tempCtx.font = `1000 ${fontSize}px Arial`;
                 tempCtx.textAlign = 'center';
                 tempCtx.textBaseline = 'middle';
-                
+            
+                // Move text up more on mobile
                 const textX = tempCanvas.width / 2;
-                const textY = tempCanvas.height / 2 - 100;
+                const textY = isMobile ? (tempCanvas.height / 2 - 160) : (tempCanvas.height / 2 - 100);
                 tempCtx.fillText(text, textX, textY);
+
                 
                 const imageData = tempCtx.getImageData(0, 0, tempCanvas.width, tempCanvas.height);
                 const data = imageData.data;
@@ -444,6 +446,8 @@
                 const fontSize = Math.min(this.canvas.width / 8, 120);
                 const textX = this.canvas.width / 2;
                 const textY = this.canvas.height / 2 - 100;
+                    // Move text up more on mobile
+                const textY = isMobile ? (this.canvas.height / 2 - 160) : (this.canvas.height / 2 - 100);
 
                 this.ctx.save();
                 this.ctx.font = `1000 ${fontSize}px Arial`;
