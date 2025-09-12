@@ -73,8 +73,8 @@
 
         .award-card {
             position: absolute;
-            width: 80%;
-            height: 80%;
+            width: 100%;
+            height: 100%;
             background: rgba(20, 20, 20, 0.15); /* Transparent background */
             border: none;
             border-radius: 15px;
@@ -118,8 +118,8 @@
             position: absolute;
             top: 0;
             left: 0;
-            width: 80%;
-            height: 80%;
+            width: 100%;
+            height: 100%;
             pointer-events: none;
             border-radius: 15px;
             overflow: hidden;
@@ -179,8 +179,8 @@
         }
 
         .award-icon img {
-            width: 80%;
-            height: 80%;
+            width: 100%;
+            height: 100%;
             object-fit: cover; /* Ensures image fills without distortion */
             border-radius: 10px;
             box-shadow: 0 0 40px 10px rgba(255,255,255,0.38);
@@ -335,44 +335,6 @@
             z-index: 50;
         }
 
-        /* Arrow styles */
-        .awards-arrows {
-            position: absolute;
-            top: 50%;
-            left: 0;
-            right: 0;
-            z-index: 100;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            pointer-events: none;
-            height: 0;
-        }
-
-        .arrow-btn {
-            pointer-events: auto;
-            background: rgba(255,255,255,0.12);
-            border: none;
-            border-radius: 50%;
-            width: 44px;
-            height: 44px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            box-shadow: 0 2px 12px rgba(0,0,0,0.18);
-            cursor: pointer;
-            transition: background 0.2s;
-        }
-
-        .arrow-btn:hover {
-            background: rgba(255,255,255,0.25);
-        }
-
-        .arrow-btn svg {
-            width: 28px;
-            height: 28px;
-            fill: #fff;
-        }
 
         .youtube-badge {
             position: absolute;
@@ -422,7 +384,9 @@
             }
 
             .award-card.prev2,
-            .award-card.next2 {
+            .award-card.next2,            
+            .award-card.prev1,
+            .award-card.next1 {
                 display: none;
             }
         }
@@ -437,14 +401,6 @@
             
             <div class="timeline-wrapper">
                 <!-- <div class="timeline-line"></div> --> <!-- Remove this line -->
-                <div class="awards-arrows">
-                    <button class="arrow-btn" id="arrowPrev" aria-label="Previous award">
-                        <svg viewBox="0 0 24 24"><path d="M15.5 19l-7-7 7-7"/></svg>
-                    </button>
-                    <button class="arrow-btn" id="arrowNext" aria-label="Next award">
-                        <svg viewBox="0 0 24 24"><path d="M8.5 5l7 7-7 7"/></svg>
-                    </button>
-                </div>
                 <div class="awards-stack" id="awardsStack">
                     
                     <div class="award-card" data-index="0">
@@ -799,15 +755,6 @@
                     });
                 });
 
-                // Arrow navigation
-                document.getElementById('arrowPrev').addEventListener('click', (e) => {
-                    e.preventDefault();
-                    this.prev();
-                });
-                document.getElementById('arrowNext').addEventListener('click', (e) => {
-                    e.preventDefault();
-                    this.next();
-                });
             }
         }
 
