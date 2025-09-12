@@ -728,10 +728,26 @@
             mouseY = e.clientY;
         });
 
-        // Touch event listeners for mobile support
+        // Touch event listeners for mobile support - only prevent default for canvas area
+        let touchStartTime = 0;
+        let touchStartX = 0;
+        let touchStartY = 0;
+
         document.addEventListener('touchstart', (e) => {
-            e.preventDefault(); // Prevent scrolling
             const touch = e.touches[0];
+            touchStartTime = Date.now();
+            touchStartX = touch.clientX;
+            touchStartY = touch.clientY;
+            
+            // Only prevent scrolling if touch is on canvas area and not on a skill sphere
+            const target = e.target;
+            const isSkillSphere = target.classList.contains('skill-sphere');
+            const isOnCanvas = target === canvas || target.tagName === 'CANVAS';
+            
+            if (!isSkillSphere && isOnCanvas) {
+                e.preventDefault();
+            }
+            
             mouseX = touch.clientX;
             mouseY = touch.clientY;
             mouseMoving = true;
@@ -739,8 +755,21 @@
         }, { passive: false });
 
         document.addEventListener('touchmove', (e) => {
-            e.preventDefault(); // Prevent scrolling
             const touch = e.touches[0];
+            const moveDistance = Math.sqrt(
+                Math.pow(touch.clientX - touchStartX, 2) + 
+                Math.pow(touch.clientY - touchStartY, 2)
+            );
+            
+            // Only prevent scrolling if user is actively dragging (moved more than 10px)
+            // and not interacting with skill spheres
+            const target = e.target;
+            const isSkillSphere = target.classList.contains('skill-sphere');
+            
+            if (!isSkillSphere && moveDistance > 10) {
+                e.preventDefault();
+            }
+            
             mouseX = touch.clientX;
             mouseY = touch.clientY;
             mouseMoving = true;
@@ -748,8 +777,23 @@
         }, { passive: false });
 
         document.addEventListener('touchend', (e) => {
-            // Don't immediately stop the effect, let the timer handle it
-            // This allows for brief pauses between touches
+            const touchEndTime = Date.now();
+            const touchDuration = touchEndTime - touchStartTime;
+            const touch = e.changedTouches[0];
+            const moveDistance = Math.sqrt(
+                Math.pow(touch.clientX - touchStartX, 2) + 
+                Math.pow(touch.clientY - touchStartY, 2)
+            );
+            
+            // If it was a quick tap (less than 300ms) with minimal movement (less than 10px)
+            // and on a skill sphere, let the click event handle it
+            const target = e.target;
+            const isSkillSphere = target.classList.contains('skill-sphere');
+            
+            if (isSkillSphere && touchDuration < 300 && moveDistance < 10) {
+                // This is a tap on a skill sphere, don't prevent the click
+                return;
+            }
         });
 
         // Handle multiple touches - use the first touch point

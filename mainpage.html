@@ -378,35 +378,73 @@
                     this.updateInteractionState(x, y);
                 });
 
-                // Touch events for mobile
+                // Touch events for mobile - smart scrolling prevention
+                let touchStartX = 0;
+                let touchStartY = 0;
+                let touchStartTime = 0;
+
                 document.addEventListener('touchstart', (e) => {
-                    e.preventDefault();
                     const touch = e.touches[0];
+                    touchStartX = touch.clientX;
+                    touchStartY = touch.clientY;
+                    touchStartTime = Date.now();
+                    
+                    // Only prevent default if touch is on canvas area
+                    const target = e.target;
                     const rect = this.canvas.getBoundingClientRect();
-                    const scaleX = this.canvas.width / rect.width;
-                    const scaleY = this.canvas.height / rect.height;
+                    const isOnCanvas = touch.clientX >= rect.left && 
+                                      touch.clientX <= rect.right && 
+                                      touch.clientY >= rect.top && 
+                                      touch.clientY <= rect.bottom;
                     
-                    const x = (touch.clientX - rect.left) * scaleX;
-                    const y = (touch.clientY - rect.top) * scaleY;
-                    
-                    this.updateInteractionState(x, y);
+                    if (isOnCanvas) {
+                        const scaleX = this.canvas.width / rect.width;
+                        const scaleY = this.canvas.height / rect.height;
+                        
+                        const x = (touch.clientX - rect.left) * scaleX;
+                        const y = (touch.clientY - rect.top) * scaleY;
+                        
+                        this.updateInteractionState(x, y);
+                        
+                        // Only prevent scrolling if we're clearly interacting with particles
+                        // (not just a casual touch)
+                        setTimeout(() => {
+                            if (this.isInteracting) {
+                                e.preventDefault();
+                            }
+                        }, 50);
+                    }
                 }, { passive: false });
 
                 document.addEventListener('touchmove', (e) => {
-                    e.preventDefault();
                     const touch = e.touches[0];
+                    const moveDistance = Math.sqrt(
+                        Math.pow(touch.clientX - touchStartX, 2) + 
+                        Math.pow(touch.clientY - touchStartY, 2)
+                    );
+                    
+                    // Only prevent scrolling if user is actively dragging on canvas
                     const rect = this.canvas.getBoundingClientRect();
-                    const scaleX = this.canvas.width / rect.width;
-                    const scaleY = this.canvas.height / rect.height;
+                    const isOnCanvas = touch.clientX >= rect.left && 
+                                      touch.clientX <= rect.right && 
+                                      touch.clientY >= rect.top && 
+                                      touch.clientY <= rect.bottom;
                     
-                    const x = (touch.clientX - rect.left) * scaleX;
-                    const y = (touch.clientY - rect.top) * scaleY;
-                    
-                    this.updateInteractionState(x, y);
+                    if (isOnCanvas && moveDistance > 15) {
+                        e.preventDefault();
+                        
+                        const scaleX = this.canvas.width / rect.width;
+                        const scaleY = this.canvas.height / rect.height;
+                        
+                        const x = (touch.clientX - rect.left) * scaleX;
+                        const y = (touch.clientY - rect.top) * scaleY;
+                        
+                        this.updateInteractionState(x, y);
+                    }
                 }, { passive: false });
 
                 document.addEventListener('touchend', (e) => {
-                    // Don't immediately stop interaction - let timer handle it
+                    // Let the timer naturally fade out the interaction
                 });
 
                 // Mouse leave event
