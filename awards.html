@@ -360,8 +360,8 @@
 /* Responsive design */
         @media (max-width: 768px) {
             .section-title {
-                font-size: 1.4rem;
-                top: 100px;
+                font-size: 2rem;
+                top: 120px;
                 left: 50%;
                 transform: translateX(-50%);
                 text-align: center;
@@ -418,7 +418,7 @@
 
 
             .progress-indicator {
-                bottom: 25px;
+                bottom: 50px;
             }
 
             .progress-dot {
@@ -427,7 +427,7 @@
             }
 
             .nav-hint {
-                bottom: px;
+                bottom: 70px;
                 font-size: 0.7rem;
             }
 
@@ -439,10 +439,18 @@
                 transform: translateX(60px);
             }
 
-            .award-card.prev2,
+            .award-card.next2 {
+                transform: translateX(-120px);
+            }
+
+            .award-card.prev2{
+                transform: translateX(120px);
+            }
+            
+            /* .award-card.prev2,
             .award-card.next2 {
                 display: none;
-            }
+            } */
 
             .youtube-badge {
                 padding: 1px;
@@ -454,6 +462,13 @@
                 height: 16px;
             }
         }
+
+        @media (max-width: 480px) {
+            .award-card.prev2,
+            .award-card.next2 {
+                display: none;
+            }
+        }
     </style>
 </head>
 <body>
@@ -461,7 +476,7 @@
     
     <div class="awards-section">
         <div class="awards-container">
-            <h2 class="section-title">AWARDS & ACHIEVEMENTS</h2>
+            <h2 class="section-title">ACHIEVEMENTS</h2>
             
             <div class="timeline-wrapper">
                 <!-- <div class="timeline-line"></div> --> <!-- Remove this line -->

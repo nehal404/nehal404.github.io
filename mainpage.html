@@ -65,7 +65,25 @@
             color: #ccc;
             text-align: center;
         }
+        @media (max-width: 1024px) {
+            .profile-image {
+                width: 350px;
+                height: 450px;
+                transform: translateY(-50px) translateX(10px);
+            }
+            .bio {
+                font-size: 18px;
+                padding: 0 20px;
+            }
 
+            #particleCanvas {
+            position: absolute;
+            top: 5vh;
+            left: 25vw;
+            width: 80vw;
+            height: 80vh;
+        }
+        }
         @media (max-width: 768px) {
             .hero {
                 justify-content: flex-start;
@@ -92,6 +110,15 @@
                 font-size: 15px;
                 padding: 0 10px; 
             }
+        }
+        @media (max-width: 400px) {
+            #particleCanvas {
+            position: absolute;
+            top: -5vh;
+            left: 5vw;
+            width: 80vw;
+            height: 80vh;
+        }
         }
     </style>
 </head>
@@ -251,27 +278,44 @@
                 this.canvas.height = window.innerHeight || 1080;
             }
 
+            // Updated getTextPosition for multi-line
             getTextPosition() {
-                const isMobile = window.innerWidth <= 768;
-                // Unified font size calculation for both particle creation and glow text
-                const fontSize = isMobile ? 
-                    Math.min(this.canvas.width / 6, 60) :  // Consistent mobile sizing
-                    Math.min(this.canvas.width / 8, 120);
+                const isMobile = window.innerWidth <= 700;
+                const isSmallMobile = window.innerWidth <= 400;
+                
+                let fontSize;
+                let text;
+                let isMultiLine = false;
+                let lineSpacing = 0;
+                
+                if (isSmallMobile) {
+                    // Split name into two lines for better fit
+                    fontSize = Math.min(this.canvas.width / 3.5, 120);
+                    text = ' NEHAL';
+                    isMultiLine = true;
+                    lineSpacing = fontSize * 1.2; // Space between lines
+                } else if (isMobile) {
+                    fontSize = Math.min(this.canvas.width / 6, 60);
+                    text = 'NEHAL ALAA';
+                } else {
+                    fontSize = Math.min(this.canvas.width / 8, 120);
+                    text = 'NEHAL ALAA';
+                }
                 
                 const textX = this.canvas.width / 2;
                 const textY = isMobile ? 
-                    this.canvas.height / 2 - 150 :  // Consistent positioning
+                    this.canvas.height / 2 - 150 :
                     this.canvas.height / 2 - 100;
                 
-                return { textX, textY, fontSize };
+                return { textX, textY, fontSize, text, isMultiLine, lineSpacing };
             }
 
+            // Updated createTextParticles method to use dynamic text
             createTextParticles() {
-                const text = 'NEHAL ALAA';
+                const { textX, textY, fontSize, text, isMultiLine, lineSpacing } = this.getTextPosition();
+                
                 const canvasWidth = this.canvas.width || window.innerWidth || 1920;
                 const canvasHeight = this.canvas.height || window.innerHeight || 1080;
-                
-                const { textX, textY, fontSize } = this.getTextPosition();
                 
                 const tempCanvas = document.createElement('canvas');
                 const tempCtx = tempCanvas.getContext('2d');
@@ -289,7 +333,18 @@
                 tempCtx.textAlign = 'center';
                 tempCtx.textBaseline = 'middle';
                 
-                tempCtx.fillText(text, textX, textY);
+                // Handle multi-line vs single line text
+                if (isMultiLine && Array.isArray(text)) {
+                    // Draw each line separately
+                    text.forEach((line, index) => {
+                        const lineY = textY + (index - (text.length - 1) / 2) * lineSpacing;
+                        tempCtx.fillText(line, textX, lineY);
+                    });
+                } else {
+                    // Single line text
+                    const textString = Array.isArray(text) ? text.join(' ') : text;
+                    tempCtx.fillText(textString, textX, textY);
+                }
                 
                 const imageData = tempCtx.getImageData(0, 0, tempCanvas.width, tempCanvas.height);
                 const data = imageData.data;
@@ -323,7 +378,8 @@
                     }
                 }
                 
-                console.log(`Created ${this.particles.length} edge particles`);
+                const textDisplay = Array.isArray(text) ? text.join(' & ') : text;
+                console.log(`Created ${this.particles.length} edge particles for text: "${textDisplay}"`);
             }
 
             isEdgePixel(data, x, y, width, height) {
@@ -496,9 +552,9 @@
                 }
             }
 
+                // Updated drawGlowingText to handle multi-line
             drawGlowingText() {
-                const text = 'NEHAL ALAA';
-                const { textX, textY, fontSize } = this.getTextPosition();
+                const { textX, textY, fontSize, text, isMultiLine, lineSpacing } = this.getTextPosition();
 
                 this.ctx.save();
                 this.ctx.font = `1000 ${fontSize}px Arial`;
@@ -507,10 +563,23 @@
                 this.ctx.shadowColor = '#fff';
                 this.ctx.shadowBlur = 200;
                 this.ctx.fillStyle = 'rgba(255,255,255,0.01)';
-                this.ctx.fillText(text, textX, textY);
+                
+                // Handle multi-line vs single line text
+                if (isMultiLine && Array.isArray(text)) {
+                    // Draw each line separately
+                    text.forEach((line, index) => {
+                        const lineY = textY + (index - (text.length - 1) / 2) * lineSpacing;
+                        this.ctx.fillText(line, textX, lineY);
+                    });
+                } else {
+                    // Single line text
+                    const textString = Array.isArray(text) ? text.join(' ') : text;
+                    this.ctx.fillText(textString, textX, textY);
+                }
+                
                 this.ctx.restore();
             }
-        }
+            }
 
         // Initialize particle text after DOM is loaded
         window.addEventListener('DOMContentLoaded', () => {
