@@ -1,0 +1,141 @@
+* {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Arial', sans-serif;
+            background: #000;
+            color: white;
+            overflow-x: hidden;
+        }
+
+        .container {
+            height: 100vh;
+            position: relative;
+        }
+
+        .hero {
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+        }
+
+        #particleCanvas {
+            position: absolute;
+            top: -5vh;
+            left: 15vw;
+            width: 100vw;
+            height: 100vh;
+            z-index: 1;
+            pointer-events: auto;
+        }
+
+        .profile-section {
+            display: flex;
+            align-items: center;
+            gap: 60px;
+            z-index: 2;
+            position: relative;
+            /* margin-top: 100px; */
+        }
+
+        .profile-image {
+            width: 550px;
+            height: 650px;
+            top: 15vh;
+            left: 10vw;
+            object-fit: cover;
+        }
+
+        .bio {
+            max-width: 700px;
+            font-size: 20px;
+            line-height: 2;
+            color: #ccc;
+            transform: translateY(70px);
+            text-align: center;
+        }
+        @media (max-width: 1024px) {
+            .hero {
+                justify-content: flex-start;
+                padding-top: 40px;
+            }
+            #particleCanvas {
+                left: 0;
+                top: -14vh;
+                width: 100vw;
+                height: 100vh;
+            }
+            .profile-section {
+                top: 20vh;
+                flex-direction: column;
+                gap: 0px;
+            }
+            
+            .profile-image {
+                width: 550px;
+                height: 550px;
+                left: 0vw;
+            }
+            
+            .bio {
+                font-size: 22px;
+                padding: 0 10px; 
+                transform: translateY(0px);
+            } }
+        
+        @media (max-width: 768px) {
+            .hero {
+                justify-content: flex-start;
+                padding-top: 40px;
+            }
+            #particleCanvas {
+                left: 0;
+                top: -14vh;
+                width: 100vw;
+                height: 100vh;
+            }
+            .profile-section {
+                top: 15vh;
+                flex-direction: column;
+            }
+            
+            .profile-image {
+                width: 300px;
+                height: 400px;
+            }
+            
+            .bio {
+                font-size: 20px;
+                padding: 0 10px;
+                transform: translateY(0px);
+            }
+        }
+
+        @media (max-width: 425px){
+            .profile-section{
+                top: 10vh;
+            }
+
+            .bio {
+                font-size: 15px;
+            }
+        }
+        @media (max-width: 400px) {
+            #particleCanvas {
+            position: absolute;
+            top: -10vh;
+            left: 10vw;
+            width: 80vw;
+            height: 80vh;
+        }
+
+        .bio {
+                transform: translateY(0px);
+            }
+        } 

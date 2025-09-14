@@ -1,0 +1,465 @@
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            background-color: #000;
+            color: #fff;
+            font-family: 'Arial', sans-serif;
+            overflow-x: hidden;
+        }
+
+        .awards-section {
+            height: 500vh; /* Extended height for scroll effect */
+            position: relative;
+            background: #000;
+        }
+
+        .awards-container {
+            position: sticky;
+            top: 0;
+            height: 100vh;
+            overflow: hidden;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 0 50px;
+        }
+
+        .section-title {
+            position: absolute;
+            top: 70px;
+            left: 50%;
+            transform: translateX(-50%);
+            font-size: 2.5rem;
+            font-weight: bold;
+            color: #fff;
+            z-index: 100;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.8);
+            letter-spacing: 2px;
+            text-align: center;
+        }
+
+        .timeline-wrapper {
+            width: 100%;
+            height: 100%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+            perspective: 1000px;
+        }
+
+        /* Remove timeline line and its dots */
+        .timeline-line {
+            display: none;
+        }
+
+        .awards-stack {
+            position: relative;
+            width: 400px;
+            height: 500px;
+            transform-style: preserve-3d;
+        }
+
+        .award-card {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            background: rgba(20, 20, 20, 0.15); /* Transparent background */
+            border: none;
+            border-radius: 15px;
+            padding: 40px 30px;
+            text-align: center;
+            transition: all 0.6s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+            cursor: pointer;
+            transform-origin: center center;
+            box-shadow: 
+                0 10px 30px rgba(0, 0, 0, 0.8),
+                inset 0 1px 0 rgba(255, 255, 255, 0),
+                inset 0 -1px 0 rgba(0, 0, 0, 0.5);
+            backdrop-filter: blur(10px);
+            overflow: hidden;
+            opacity: 0;
+            pointer-events: none;
+            z-index: 1;
+            filter: blur(2px);
+        }
+
+        .award-card.visible {
+            opacity: 1;
+            pointer-events: auto;
+            filter: none;
+        }
+
+        .award-card::before {
+            content: '';
+            position: absolute;
+            top: -2px;
+            left: -2px;
+            right: -2px;
+            bottom: -2px;
+            background: transparent;
+            border-radius: 15px;
+            pointer-events: none;
+            z-index: -1;
+        }
+
+        .award-card .card-particles {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            border-radius: 15px;
+            overflow: hidden;
+        }
+
+        .award-card.active {
+            transform: translateZ(50px) scale(1.05);
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.9);
+            z-index: 10;
+        }
+
+        .award-card.prev1 {
+            transform: translateX(-120px) translateZ(-20px) rotateY(15deg) scale(0.95);
+            opacity: 0.8;
+            z-index: 7;
+        }
+
+        .award-card.prev2 {
+            transform: translateX(-240px) translateZ(-40px) rotateY(25deg) scale(0.9);
+            opacity: 0.5;
+            z-index: 5;
+            filter: blur(1px);
+        }
+
+        .award-card.next1 {
+            transform: translateX(120px) translateZ(-20px) rotateY(-15deg) scale(0.95);
+            opacity: 0.8;
+            z-index: 7;
+        }
+
+        .award-card.next2 {
+            transform: translateX(240px) translateZ(-40px) rotateY(-25deg) scale(0.9);
+            opacity: 0.5;
+            z-index: 5;
+            filter: blur(1px);
+        }
+
+        /* Hide all other cards */
+        .award-card.stack-far {
+            opacity: 0;
+            pointer-events: none;
+            z-index: 1;
+            filter: blur(2px);
+        }
+
+        .award-icon {
+            width: 140px;
+            height: 110px;
+            margin: 0 auto 24px;
+            border-radius: 10px;
+            box-shadow: 0 12px 40px 0 rgba(255,255,255,0.28), 0 4px 16px rgba(255,255,255,0.15);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            overflow: hidden;
+            background: transparent;
+        }
+
+        .award-icon img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover; /* Ensures image fills without distortion */
+            border-radius: 10px;
+            box-shadow: 0 0 40px 10px rgba(255,255,255,0.38);
+        }
+
+        .award-card.active .award-icon {
+            box-shadow: 0 12px 40px 0 rgba(255,255,255,0.35), 0 4px 16px rgba(255,255,255,0.18);
+            transform: scale(1.05);
+        }
+
+        .award-date {
+            color: #bbb;
+            font-size: 0.9rem;
+            font-weight: bold;
+            margin-bottom: 15px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            border-bottom: 1px solid #333;
+            padding-bottom: 10px;
+        }
+
+        .award-card.active .award-date {
+            color: #fff;
+        }
+
+        .award-title {
+            font-size: 1.4rem;
+            font-weight: bold;
+            margin-bottom: 15px;
+            color: #fff;
+            line-height: 1.3;
+        }
+
+        .award-event {
+            color: #999;
+            font-size: 1rem;
+            font-weight: 600;
+            margin-bottom: 20px;
+            line-height: 1.4;
+        }
+
+        .award-card.active .award-event {
+            color: #ccc;
+        }
+
+        .award-description {
+            color: #777;
+            font-size: 0.9rem;
+            line-height: 1.6;
+            margin-bottom: 15px;
+        }
+
+        .award-card.active .award-description {
+            color: #aaa;
+        }
+
+        .award-value {
+            color: #fff;
+            font-weight: bold;
+            margin-top: 15px;
+            padding: 10px;
+            border-radius: 8px;
+            background: rgba(255, 255, 255, 0.05);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .award-card.active .award-value {
+            background: rgba(255, 255, 255, 0.1);
+        }
+
+        /* Card particle system */
+        .card-particle {
+            position: absolute;
+            width: 2px;
+            height: 2px;
+            background: #fff;
+            border-radius: 50%;
+            opacity: 0.6;
+            animation: cardParticleFloat 3s ease-in-out infinite;
+        }
+
+        @keyframes cardParticleFloat {
+            0%, 100% { 
+                opacity: 0.3;
+                transform: scale(0.8);
+            }
+            50% { 
+                opacity: 0.8;
+                transform: scale(1.2);
+            }
+        }
+
+        /* Progress indicator */
+        .progress-indicator {
+            position: absolute;
+            bottom: 50px;
+            left: 50%;
+            transform: translateX(-50%);
+            display: flex;
+            gap: 10px;
+            z-index: 50;
+        }
+
+        .progress-dot {
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+            background: #333;
+            border: 1px solid #555;
+            transition: all 0.3s ease;
+            cursor: pointer;
+        }
+
+        .progress-dot.active {
+            background: #fff;
+            border-color: #fff;
+            transform: scale(1.2);
+        }
+
+        /* Noise texture overlay */
+        .noise-overlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            opacity: 0.03;
+            pointer-events: none;
+            background-image: 
+                radial-gradient(circle at 25% 25%, #fff 1px, transparent 1px),
+                radial-gradient(circle at 75% 75%, #fff 1px, transparent 1px);
+            background-size: 100px 100px;
+            background-position: 0 0, 50px 50px;
+            animation: noiseMove 20s linear infinite;
+        }
+
+        @keyframes noiseMove {
+            0% { transform: translate(0, 0); }
+            100% { transform: translate(100px, 100px); }
+        }
+
+        /* Navigation hints */
+        .nav-hint {
+            position: absolute;
+            bottom: 120px;
+            left: 50%;
+            transform: translateX(-50%);
+            color: #666;
+            font-size: 0.8rem;
+            text-align: center;
+            z-index: 50;
+        }
+
+
+        .youtube-badge {
+            position: absolute;
+            left: 10px;
+            top: 50%;
+            transform: translateY(-50%);
+            z-index: 2;
+            background: rgba(0,0,0,0.12);
+            border-radius: 50%;
+            padding: 2px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.18);
+            transition: box-shadow 0.2s;
+        }
+
+        .award-icon a:hover .youtube-badge {
+            box-shadow: 0 4px 16px rgba(255,0,0,0.25);
+        }
+
+
+/* Responsive design */
+        @media (max-width: 768px) {
+            .section-title {
+                font-size: 2rem;
+                top: 120px;
+                left: 50%;
+                transform: translateX(-50%);
+                text-align: center;
+            }
+
+            .awards-container {
+                padding: 0 10px;
+            }
+
+            .awards-stack {
+                width: 240px;
+                height: 320px;
+            }
+
+            .award-card {
+                padding: 15px 12px;
+            }
+
+            .award-icon {
+                width: 80px;
+                height: 65px;
+                margin: 0 auto 12px;
+            }
+
+            .award-date {
+                font-size: 0.75rem;
+                margin-bottom: 8px;
+                padding-bottom: 6px;
+            }
+
+            .award-title {
+                font-size: 1rem;
+                margin-bottom: 8px;
+                line-height: 1.2;
+            }
+
+            .award-event {
+                font-size: 0.8rem;
+                margin-bottom: 10px;
+                line-height: 1.3;
+            }
+
+            .award-description {
+                font-size: 0.75rem;
+                margin-bottom: 8px;
+                line-height: 1.4;
+            }
+
+            .award-value {
+                font-size: 0.8rem;
+                margin-top: 8px;
+                padding: 6px;
+            }
+
+
+            .progress-indicator {
+                bottom: 50px;
+            }
+
+            .progress-dot {
+                width: 8px;
+                height: 8px;
+            }
+
+            .nav-hint {
+                bottom: 70px;
+                font-size: 0.7rem;
+            }
+
+            .award-card.next1 {
+                transform: translateX(-60px);
+            }
+
+            .award-card.prev1{
+                transform: translateX(60px);
+            }
+
+            .award-card.next2 {
+                transform: translateX(-120px);
+            }
+
+            .award-card.prev2{
+                transform: translateX(120px);
+            }
+            
+            /* .award-card.prev2,
+            .award-card.next2 {
+                display: none;
+            } */
+
+            .youtube-badge {
+                padding: 1px;
+                left: 5px;
+            }
+
+            .youtube-badge svg {
+                width: 16px;
+                height: 16px;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .award-card.prev2,
+            .award-card.next2 {
+                display: none;
+            }
+        }

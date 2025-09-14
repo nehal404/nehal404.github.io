@@ -1,0 +1,452 @@
+class Particle {
+            constructor(x, y) {
+                this.originalX = x;
+                this.originalY = y;
+                this.x = x;
+                this.y = y;
+                this.vx = (Math.random() - 0.5) * 0.4;
+                this.vy = (Math.random() - 0.5) * 0.4;
+                this.size = Math.random() * 1 + 0.5;
+                this.alpha = Math.random() * 0.5 + 0.5;
+                this.returnSpeed = 0.005 + Math.random() * 0.01;
+                this.attractionRadius = 150 + Math.random() * 150;
+                this.maxSpeed = 5 + Math.random() * 3;
+                
+                this.randomMovement = 0.01 + Math.random() * 0.02;
+                this.driftAngle = Math.random() * Math.PI * 2;
+                this.isDead = false;
+                this.lifespan = 1300 + Math.random() * 200;
+                this.age = 0;
+                this.regenerationDelay = Math.random();
+            }
+
+            update(mouseX, mouseY, isInteracting) {
+                this.age++;
+                
+                // More chaotic random movement
+                this.driftAngle += (Math.random() - 0.5) * 0.2;
+                this.vx += Math.cos(this.driftAngle) * this.randomMovement * (Math.random() * 0.5);
+                this.vy += Math.sin(this.driftAngle) * this.randomMovement * (Math.random() * 0.5);
+
+                // Mouse attraction - only when actively interacting
+                if (isInteracting && mouseX !== undefined && mouseY !== undefined) {
+                    const dx = mouseX - this.x;
+                    const dy = mouseY - this.y;
+                    const distance = Math.sqrt(dx * dx + dy * dy);
+                    
+                    if (distance < this.attractionRadius && distance > 0) {
+                        const force = (this.attractionRadius - distance) / this.attractionRadius;
+                        // Increased attraction strength for more dramatic effect
+                        const attractionStrength = 15.0 + Math.random() * 8.0;
+                        const normalizedDx = dx / distance;
+                        const normalizedDy = dy / distance;
+                        
+                        this.vx += normalizedDx * force * attractionStrength;
+                        this.vy += normalizedDy * force * attractionStrength;
+                    }
+                }
+
+                // Variable return force
+                const returnDx = this.originalX - this.x;
+                const returnDy = this.originalY - this.y;
+                this.vx += returnDx * this.returnSpeed * (0.5 + Math.random() * 0.5);
+                this.vy += returnDy * this.returnSpeed * (0.5 + Math.random() * 0.5);
+
+                // Variable friction
+                const friction = 0.90 + Math.random() * 0.05;
+                this.vx *= friction;
+                this.vy *= friction;
+
+                // Limit speed
+                const speed = Math.sqrt(this.vx * this.vx + this.vy * this.vy);
+                if (speed > this.maxSpeed) {
+                    this.vx = (this.vx / speed) * this.maxSpeed;
+                    this.vy = (this.vy / speed) * this.maxSpeed;
+                }
+
+                this.x += this.vx;
+                this.y += this.vy;
+
+                // More varied death conditions
+                if (this.y < -100 || 
+                    Math.abs(this.x - this.originalX) > 400 || 
+                    Math.abs(this.y - this.originalY) > 400 ||
+                    this.age > this.lifespan) {
+                    this.isDead = true;
+                }
+            }
+
+            reset() {
+                // Random reset position around original
+                this.x = this.originalX + (Math.random() - 0.5) * 6;
+                this.y = this.originalY + (Math.random() - 0.5) * 6;
+                this.vx = (Math.random() - 0.5) * 0.4;
+                this.vy = (Math.random() - 0.5) * 0.4;
+                this.isDead = false;
+                this.age = 0;
+                this.driftAngle = Math.random() * Math.PI * 2;
+                
+                // Randomize properties on reset
+                this.randomMovement = 0.01 + Math.random() * 0.02;
+                this.lifespan = 1300 + Math.random() * 200;
+                this.regenerationDelay = Math.random();
+            }
+
+            draw(ctx) {
+                // Vary alpha based on age for more organic feel
+                const ageAlpha = Math.max(0.3, 1 - (this.age / this.lifespan));
+                
+                ctx.save();
+                ctx.globalAlpha = this.alpha * ageAlpha;
+                ctx.fillStyle = '#ffffff';
+                
+                ctx.shadowColor = '#ffffff';
+                ctx.shadowBlur = 0.5 + Math.random() * 0.5;
+                
+                ctx.beginPath();
+                ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
+                ctx.fill();
+                
+                ctx.shadowBlur = 0;
+                ctx.globalAlpha = this.alpha * ageAlpha * 1.5;
+                ctx.beginPath();
+                ctx.arc(this.x, this.y, this.size * 0.5, 0, Math.PI * 2);
+                ctx.fill();
+                
+                ctx.restore();
+            }
+        }
+
+        class ParticleText {
+            constructor(canvas) {
+                this.canvas = canvas;
+                this.ctx = canvas.getContext('2d');
+                this.particles = [];
+                this.mouse = { x: undefined, y: undefined };
+                this.isInteracting = false;
+                this.interactionTimer = 0;
+                this.animationId = null;
+                
+                this.resize();
+                this.createTextParticles();
+                this.bindEvents();
+                this.animate();
+            }
+
+            resize() {
+                this.canvas.width = window.innerWidth || 1920;
+                this.canvas.height = window.innerHeight || 1080;
+            }
+
+            // Updated getTextPosition for multi-line
+            getTextPosition() {
+                const isMobile = window.innerWidth <= 700;
+                const isSmallMobile = window.innerWidth <= 400;
+                
+                let fontSize;
+                let text;
+                let isMultiLine = false;
+                let lineSpacing = 0;
+                
+                if (isSmallMobile) {
+                    // Split name into two lines for better fit
+                    fontSize = Math.min(this.canvas.width / 3.5, 120);
+                    text = ' NEHAL';
+                    isMultiLine = true;
+                    lineSpacing = fontSize * 1.2; // Space between lines
+                } else if (isMobile) {
+                    fontSize = Math.min(this.canvas.width / 6, 60);
+                    text = 'NEHAL ALAA';
+                } else {
+                    fontSize = Math.min(this.canvas.width / 8, 120);
+                    text = 'NEHAL ALAA';
+                }
+                
+                const textX = this.canvas.width / 2;
+                const textY = isMobile ? 
+                    this.canvas.height / 2 - 150 :
+                    this.canvas.height / 2 - 100;
+                
+                return { textX, textY, fontSize, text, isMultiLine, lineSpacing };
+            }
+
+            // Updated createTextParticles method to use dynamic text
+            createTextParticles() {
+                const { textX, textY, fontSize, text, isMultiLine, lineSpacing } = this.getTextPosition();
+                
+                const canvasWidth = this.canvas.width || window.innerWidth || 1920;
+                const canvasHeight = this.canvas.height || window.innerHeight || 1080;
+                
+                const tempCanvas = document.createElement('canvas');
+                const tempCtx = tempCanvas.getContext('2d');
+                
+                tempCanvas.width = canvasWidth;
+                tempCanvas.height = canvasHeight;
+                
+                if (tempCanvas.width === 0 || tempCanvas.height === 0) {
+                    console.warn('Canvas dimensions are 0, skipping particle creation');
+                    return;
+                }
+                
+                tempCtx.fillStyle = '#ffffff';
+                tempCtx.font = `1000 ${fontSize}px Arial`;
+                tempCtx.textAlign = 'center';
+                tempCtx.textBaseline = 'middle';
+                
+                // Handle multi-line vs single line text
+                if (isMultiLine && Array.isArray(text)) {
+                    // Draw each line separately
+                    text.forEach((line, index) => {
+                        const lineY = textY + (index - (text.length - 1) / 2) * lineSpacing;
+                        tempCtx.fillText(line, textX, lineY);
+                    });
+                } else {
+                    // Single line text
+                    const textString = Array.isArray(text) ? text.join(' ') : text;
+                    tempCtx.fillText(textString, textX, textY);
+                }
+                
+                const imageData = tempCtx.getImageData(0, 0, tempCanvas.width, tempCanvas.height);
+                const data = imageData.data;
+                
+                this.particles = [];
+                
+                const particleSpacing = 0.5;
+                const edgePixels = [];
+                
+                for (let y = 2; y < tempCanvas.height - 2; y += 2) {
+                    for (let x = 2; x < tempCanvas.width - 2; x += 2) {
+                        const index = (y * tempCanvas.width + x) * 4;
+                        const alpha = data[index + 3];
+                        
+                        if (alpha > 128) {
+                            const isEdge = this.isEdgePixel(data, x, y, tempCanvas.width, tempCanvas.height);
+                            
+                            if (isEdge) {
+                                edgePixels.push({x, y});
+                            }
+                        }
+                    }
+                }
+                
+                for (let i = 0; i < edgePixels.length; i += particleSpacing) {
+                    const pixel = edgePixels[i];
+                    if (pixel && Math.random() < 1) {
+                        const offsetX = (Math.random() - 0.5) * 2;
+                        const offsetY = (Math.random() - 0.5) * 2;
+                        this.particles.push(new Particle(pixel.x + offsetX, pixel.y + offsetY));
+                    }
+                }
+                
+                const textDisplay = Array.isArray(text) ? text.join(' & ') : text;
+                console.log(`Created ${this.particles.length} edge particles for text: "${textDisplay}"`);
+            }
+
+            isEdgePixel(data, x, y, width, height) {
+                const getAlpha = (px, py) => {
+                    if (px < 0 || px >= width || py < 0 || py >= height) return 0;
+                    return data[(py * width + px) * 4 + 3];
+                };
+                
+                const currentAlpha = getAlpha(x, y);
+                if (currentAlpha < 128) return false;
+                
+                const neighbors = [
+                    [-1, -1], [0, -1], [1, -1],
+                    [-1,  0],          [1,  0],
+                    [-1,  1], [0,  1], [1,  1],
+                    [-2, 0], [2, 0], [0, -2], [0, 2]
+                ];
+                
+                let transparentNeighbors = 0;
+                for (let [dx, dy] of neighbors) {
+                    if (getAlpha(x + dx, y + dy) < 128) {
+                        transparentNeighbors++;
+                    }
+                }
+                
+                return transparentNeighbors > 0;
+            }
+
+            updateInteractionState(x, y) {
+                // Update mouse position and interaction state
+                this.mouse.x = x;
+                this.mouse.y = y;
+                this.isInteracting = true;
+                this.interactionTimer = 0;
+            }
+
+            bindEvents() {
+                window.addEventListener('resize', () => {
+                    this.resize();
+                    this.createTextParticles();
+                });
+
+                // Mouse events
+                document.addEventListener('mousemove', (e) => {
+                    const rect = this.canvas.getBoundingClientRect();
+                    const scaleX = this.canvas.width / rect.width;
+                    const scaleY = this.canvas.height / rect.height;
+                    
+                    const x = (e.clientX - rect.left) * scaleX;
+                    const y = (e.clientY - rect.top) * scaleY;
+                    
+                    this.updateInteractionState(x, y);
+                });
+
+                // Touch events for mobile - smart scrolling prevention
+                let touchStartX = 0;
+                let touchStartY = 0;
+                let touchStartTime = 0;
+
+                document.addEventListener('touchstart', (e) => {
+                    const touch = e.touches[0];
+                    touchStartX = touch.clientX;
+                    touchStartY = touch.clientY;
+                    touchStartTime = Date.now();
+                    
+                    // Only prevent default if touch is on canvas area
+                    const target = e.target;
+                    const rect = this.canvas.getBoundingClientRect();
+                    const isOnCanvas = touch.clientX >= rect.left && 
+                                      touch.clientX <= rect.right && 
+                                      touch.clientY >= rect.top && 
+                                      touch.clientY <= rect.bottom;
+                    
+                    if (isOnCanvas) {
+                        const scaleX = this.canvas.width / rect.width;
+                        const scaleY = this.canvas.height / rect.height;
+                        
+                        const x = (touch.clientX - rect.left) * scaleX;
+                        const y = (touch.clientY - rect.top) * scaleY;
+                        
+                        this.updateInteractionState(x, y);
+                        
+                        // Only prevent scrolling if we're clearly interacting with particles
+                        // (not just a casual touch)
+                        setTimeout(() => {
+                            if (this.isInteracting) {
+                                e.preventDefault();
+                            }
+                        }, 50);
+                    }
+                }, { passive: false });
+
+                document.addEventListener('touchmove', (e) => {
+                    const touch = e.touches[0];
+                    const moveDistance = Math.sqrt(
+                        Math.pow(touch.clientX - touchStartX, 2) + 
+                        Math.pow(touch.clientY - touchStartY, 2)
+                    );
+                    
+                    // Only prevent scrolling if user is actively dragging on canvas
+                    const rect = this.canvas.getBoundingClientRect();
+                    const isOnCanvas = touch.clientX >= rect.left && 
+                                      touch.clientX <= rect.right && 
+                                      touch.clientY >= rect.top && 
+                                      touch.clientY <= rect.bottom;
+                    
+                    if (isOnCanvas && moveDistance > 15) {
+                        e.preventDefault();
+                        
+                        const scaleX = this.canvas.width / rect.width;
+                        const scaleY = this.canvas.height / rect.height;
+                        
+                        const x = (touch.clientX - rect.left) * scaleX;
+                        const y = (touch.clientY - rect.top) * scaleY;
+                        
+                        this.updateInteractionState(x, y);
+                    }
+                }, { passive: false });
+
+                document.addEventListener('touchend', (e) => {
+                    // Let the timer naturally fade out the interaction
+                });
+
+                // Mouse leave event
+                document.addEventListener('mouseleave', (e) => {
+                    // Let the timer naturally fade out the interaction
+                });
+            }
+
+            animate() {
+                // Update interaction timer
+                if (this.isInteracting) {
+                    this.interactionTimer++;
+                    // After 30 frames (~0.5 seconds) of no new input, stop interaction
+                    if (this.interactionTimer > 30) {
+                        this.isInteracting = false;
+                        this.mouse.x = undefined;
+                        this.mouse.y = undefined;
+                    }
+                }
+
+                this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
+                this.drawGlowingText();
+
+                for (let i = 0; i < this.particles.length; i++) {
+                    const particle = this.particles[i];
+                    
+                    particle.update(this.mouse.x, this.mouse.y, this.isInteracting);
+                    
+                    if (particle.isDead) {
+                        if (particle.regenerationDelay <= 0) {
+                            particle.reset();
+                        } else {
+                            particle.regenerationDelay--;
+                            continue;
+                        }
+                    }
+                    
+                    if (!particle.isDead || particle.regenerationDelay <= 0) {
+                        particle.draw(this.ctx);
+                    }
+                }
+
+                this.animationId = requestAnimationFrame(() => this.animate());
+            }
+
+            destroy() {
+                if (this.animationId) {
+                    cancelAnimationFrame(this.animationId);
+                }
+            }
+
+                // Updated drawGlowingText to handle multi-line
+            drawGlowingText() {
+                const { textX, textY, fontSize, text, isMultiLine, lineSpacing } = this.getTextPosition();
+
+                this.ctx.save();
+                this.ctx.font = `1000 ${fontSize}px Arial`;
+                this.ctx.textAlign = 'center';
+                this.ctx.textBaseline = 'middle';
+                this.ctx.shadowColor = '#fff';
+                this.ctx.shadowBlur = 200;
+                this.ctx.fillStyle = 'rgba(255,255,255,0.01)';
+                
+                // Handle multi-line vs single line text
+                if (isMultiLine && Array.isArray(text)) {
+                    // Draw each line separately
+                    text.forEach((line, index) => {
+                        const lineY = textY + (index - (text.length - 1) / 2) * lineSpacing;
+                        this.ctx.fillText(line, textX, lineY);
+                    });
+                } else {
+                    // Single line text
+                    const textString = Array.isArray(text) ? text.join(' ') : text;
+                    this.ctx.fillText(textString, textX, textY);
+                }
+                
+                this.ctx.restore();
+            }
+            }
+
+        // Initialize particle text after DOM is loaded
+        window.addEventListener('DOMContentLoaded', () => {
+            const canvas = document.getElementById('particleCanvas');
+            const particleText = new ParticleText(canvas);
+            
+            window.addEventListener('beforeunload', () => {
+                particleText.destroy();
+            });
+        });
