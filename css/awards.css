@@ -13,7 +13,6 @@
         }
 
         .awards-section {
-            height: 500vh; /* Extended height for scroll effect */
             position: relative;
             background: #000;
         }
@@ -317,18 +316,6 @@
             100% { transform: translate(100px, 100px); }
         }
 
-        /* Navigation hints */
-        .nav-hint {
-            position: absolute;
-            bottom: 120px;
-            left: 50%;
-            transform: translateX(-50%);
-            color: #666;
-            font-size: 0.8rem;
-            text-align: center;
-            z-index: 50;
-        }
-
 
         .youtube-badge {
             position: absolute;
@@ -418,11 +405,6 @@
             .progress-dot {
                 width: 8px;
                 height: 8px;
-            }
-
-            .nav-hint {
-                bottom: 70px;
-                font-size: 0.7rem;
             }
 
             .award-card.next1 {

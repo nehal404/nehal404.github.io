@@ -143,31 +143,6 @@ class AwardsTimeline {
             }
 
             bindEvents() {
-                // Scroll navigation
-                let ticking = false;
-                const section = document.querySelector('.awards-section');
-                
-                window.addEventListener('scroll', () => {
-                    if (!ticking) {
-                        requestAnimationFrame(() => {
-                            const scrollTop = window.pageYOffset;
-                            const sectionTop = section.offsetTop;
-                            const sectionHeight = section.offsetHeight;
-                            
-                            if (scrollTop >= sectionTop && scrollTop <= sectionTop + sectionHeight) {
-                                const scrollProgress = (scrollTop - sectionTop) / (sectionHeight - window.innerHeight);
-                                // Smoothly interpolate index
-                                const targetIndex = Math.round(scrollProgress * (this.totalAwards - 1));
-                                if (targetIndex !== this.currentIndex && targetIndex >= 0 && targetIndex < this.totalAwards) {
-                                    this.goToAward(targetIndex);
-                                }
-                            }
-                            ticking = false;
-                        });
-                        ticking = true;
-                    }
-                });
-
                 // Keyboard navigation
                 document.addEventListener('keydown', (e) => {
                     if (e.key === 'ArrowLeft' || e.key === 'ArrowUp') {
