@@ -5,7 +5,7 @@ class PortfolioChatbot {
                 this.sendButton = document.getElementById('sendButton');
                 this.typingIndicator = document.getElementById('typingIndicator');
                 
-                this.backendUrl = 'https://portfolio-chatbot-backend-j8t9yjneu-nehals-projects-166c9d08.vercel.app/api/chat';
+                this.backendUrl = 'https://portfolio-chatbot-backend-8kcn113s5-nehals-projects-166c9d08.vercel.app/api/chat';
                 
                 this.init();
             }
