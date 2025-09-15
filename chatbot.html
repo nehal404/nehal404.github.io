@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Chat with Nehal's AI Assistant</title>
+    <link rel="stylesheet" href="css/chatbot.css">
+</head>
+<body>
+    
+    <div class="chat-container">
+        <div class="chat-header">
+            <h1>My AI Assistant</h1>
+        </div>
+
+        <div class="chat-window">
+            <div class="messages-container" id="messagesContainer">
+                <div class="welcome-message">
+                    <p>Hi! I'm Nehal's AI assistant. I can answer questions about her experience, projects, and skills.</p>
+                    <p>Try asking about her work on RoboDoc, AI projects, or anything on your mind!</p>
+                </div>
+
+                <div class="sample-questions">
+                    <div class="sample-question" onclick="askQuestion('Tell me about RoboDoc project')">
+                        Tell me about RoboDoc project
+                    </div>
+                    <div class="sample-question" onclick="askQuestion('What are Nehal\'s main technical skills?')">
+                        What are Nehal's main technical skills?
+                    </div>
+                    <div class="sample-question" onclick="askQuestion('What awards has she won?')">
+                        What awards has she won?
+                    </div>
+                    <div class="sample-question" onclick="askQuestion('Tell me about her AI and IoT projects')">
+                        Tell me about her AI and IoT projects
+                    </div>
+                </div>
+            </div>
+
+            <div class="typing-indicator" id="typingIndicator">
+                <div class="message-avatar" style="background: linear-gradient(135deg, #059669, #0d9488);">NA</div>
+                <div class="typing-dots">
+                    <div class="typing-dot"></div>
+                    <div class="typing-dot"></div>
+                    <div class="typing-dot"></div>
+                </div>
+            </div>
+
+            <div class="input-section">
+                <div class="input-container">
+                    <div class="input-wrapper">
+                        <textarea 
+                            id="messageInput" 
+                            placeholder="Ask me about Nehal..."
+                            rows="1"
+                        ></textarea>
+                    </div>
+                    <button class="send-button">
+                    <svg xmlns="http://www.w3.org/2000/svg" 
+                        viewBox="0 0 24 24" 
+                        fill="currentColor" 
+                        class="send-icon">
+                        <path d="M2 21l21-9L2 3v7l15 2-15 2v7z"/>
+                    </svg>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+    <script src="js/chatbot.js"></script>
+</body>
+</html>

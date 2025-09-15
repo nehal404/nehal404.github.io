@@ -1,7 +1,7 @@
         class PortfolioManager {
             constructor() {
                 this.currentSection = 'about';
-                this.sections = ['about', 'skills', 'awards'];
+                this.sections = ['about','chatbot', 'skills', 'awards'];
                 this.navLinks = document.querySelectorAll('.nav-link');
                 this.scrollDots = document.querySelectorAll('.scroll-dot');
                 this.navbar = document.getElementById('navbar');
@@ -13,6 +13,7 @@
                 this.isMenuOpen = false;
                 this.frames = {
                     about: document.getElementById('aboutFrame'),
+                    chatbot: document.getElementById('chatbotFrame'),
                     skills: document.getElementById('skillsFrame'),
                     awards: document.getElementById('awardsFrame')
                 };
@@ -104,9 +105,12 @@
                                 this.scrollToSection('about');
                                 break;
                             case '2':
-                                this.scrollToSection('skills');
+                                this.scrollToSection('chatbot');
                                 break;
                             case '3':
+                                this.scrollToSection('skills');
+                                break;
+                            case '4':
                                 this.scrollToSection('awards');
                                 break;
                         }
@@ -268,10 +272,11 @@
                     
                     try {
                         const aboutLoaded = this.frames.about.contentDocument !== null;
+                        const chatbotLoaded = this.frames.chatbot.contentDocument !== null;
                         const skillsLoaded = this.frames.skills.contentDocument !== null;
                         const awardsLoaded = this.frames.awards.contentDocument !== null;
                         
-                        if ((aboutLoaded && skillsLoaded && awardsLoaded) || checkCount > 20) {
+                        if ((aboutLoaded && chatbotLoaded && skillsLoaded && awardsLoaded) || checkCount > 20) {
                             setTimeout(() => {
                                 this.loadingOverlay.classList.add('hidden');
                             }, 800);
