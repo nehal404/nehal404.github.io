@@ -421,7 +421,7 @@ class Particle {
                 this.ctx.textAlign = 'center';
                 this.ctx.textBaseline = 'middle';
                 this.ctx.shadowColor = '#fff';
-                this.ctx.shadowBlur = 200;
+                this.ctx.shadowBlur = 120;
                 this.ctx.fillStyle = 'rgba(255,255,255,0.01)';
                 
                 // Handle multi-line vs single line text

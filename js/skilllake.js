@@ -463,7 +463,8 @@ const skills = [
         // Initialize particles - fill bottom half with dense particles
         function initParticles() {
             particles = [];
-            const particleCount = 3000; // Very dense particle system
+            const reduce = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+            const particleCount = reduce ? 1000 : 1800;
             
             for (let i = 0; i < particleCount; i++) {
                 const x = Math.random() * canvas.width;

@@ -22,7 +22,9 @@ class PortfolioChatbot {
                         this.sendMessage();
                     }
                 });
-
+                if (this.sendButton) {
+                    this.sendButton.addEventListener('click', () => this.sendMessage());
+                }
             }
 
             addMessage(content, type) {
@@ -102,7 +104,6 @@ class PortfolioChatbot {
 
                 this.messageInput.disabled = true;
                 this.sendButton.disabled = true;
-                this.sendButton.innerHTML = '<span>Sending...</span>';
 
                 // Add user message to conversation history
                 this.conversationHistory.push({ role: 'user', content: message });
@@ -188,7 +189,6 @@ class PortfolioChatbot {
                 } finally {
                     this.messageInput.disabled = false;
                     this.sendButton.disabled = false;
-                    this.sendButton.innerHTML = '<span>Send</span>';
                     this.messageInput.focus();
                 }
             }

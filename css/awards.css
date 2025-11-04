@@ -10,11 +10,16 @@
             color: #fff;
             font-family: 'Arial', sans-serif;
             overflow-x: hidden;
+            overflow-y: hidden; /* prevent vertical scroll inside iframe */
+            height: 100vh; /* ensure it fits exactly in the iframe */
         }
 
         .awards-section {
             position: relative;
             background: #000;
+            width: 100%;
+            max-width: 100vw;
+            overflow-x: hidden;
         }
 
         .awards-container {
@@ -22,10 +27,13 @@
             top: 0;
             height: 100vh;
             overflow: hidden;
+            overflow-x: hidden;
             display: flex;
+            flex-direction: column;
             align-items: center;
             justify-content: center;
-            padding: 0 50px;
+            padding: 0 20px;
+            gap: 24px;
         }
 
         .section-title {
@@ -44,12 +52,13 @@
 
         .timeline-wrapper {
             width: 100%;
-            height: 100%;
+            height: auto;
             display: flex;
             align-items: center;
             justify-content: center;
             position: relative;
-            perspective: 1000px;
+            overflow: visible;
+            max-width: 100vw;
         }
 
         /* Remove timeline line and its dots */
@@ -57,42 +66,71 @@
             display: none;
         }
 
-        .awards-stack {
+        /* Auto-scrolling carousel for awards */
+        .awards-carousel {
+            --items: 11;
+            --carousel-duration: 30s;
+            --carousel-width: min(92vw, 1200px);
+            --carousel-item-width: 18rem;
+            --carousel-item-height: 24rem;
+            --carousel-item-gap: 1.2rem;
             position: relative;
-            width: 400px;
-            height: 500px;
-            transform-style: preserve-3d;
+            width: var(--carousel-width);
+            height: var(--carousel-item-height);
+            overflow: clip;
+            -webkit-mask-image: linear-gradient(to right, transparent, black 10% 90%, transparent);
+            mask-image: linear-gradient(to right, transparent, black 10% 90%, transparent);
         }
 
-        .award-card {
+        .awards-carousel:hover > .award-card { animation-play-state: paused; }
+
+        .awards-carousel .award-card {
             position: absolute;
-            width: 100%;
-            height: 100%;
-            background: rgba(20, 20, 20, 0.15); /* Transparent background */
-            border: none;
+            top: 0;
+            left: calc(100% + var(--carousel-item-gap));
+            width: var(--carousel-item-width);
+            height: var(--carousel-item-height);
+            background: rgba(20, 20, 20, 0.15);
+            border: 1px solid rgba(255,255,255,0.08);
             border-radius: 15px;
-            padding: 40px 30px;
+            padding: 24px 18px;
             text-align: center;
-            transition: all 0.6s cubic-bezier(0.25, 0.46, 0.45, 0.94);
-            cursor: pointer;
-            transform-origin: center center;
-            box-shadow: 
-                0 10px 30px rgba(0, 0, 0, 0.8),
-                inset 0 1px 0 rgba(255, 255, 255, 0),
-                inset 0 -1px 0 rgba(0, 0, 0, 0.5);
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.8);
             backdrop-filter: blur(10px);
             overflow: hidden;
-            opacity: 0;
-            pointer-events: none;
-            z-index: 1;
-            filter: blur(2px);
-        }
-
-        .award-card.visible {
             opacity: 1;
             pointer-events: auto;
             filter: none;
+            will-change: transform;
+            animation-name: awards-marquee;
+            animation-duration: var(--carousel-duration);
+            animation-timing-function: linear;
+            animation-iteration-count: infinite;
+            animation-delay: calc((var(--carousel-duration) / var(--items)) * var(--i) * -1);
         }
+
+        .awards-carousel .award-card:nth-child(1) { --i: 0; }
+        .awards-carousel .award-card:nth-child(2) { --i: 1; }
+        .awards-carousel .award-card:nth-child(3) { --i: 2; }
+        .awards-carousel .award-card:nth-child(4) { --i: 3; }
+        .awards-carousel .award-card:nth-child(5) { --i: 4; }
+        .awards-carousel .award-card:nth-child(6) { --i: 5; }
+        .awards-carousel .award-card:nth-child(7) { --i: 6; }
+        .awards-carousel .award-card:nth-child(8) { --i: 7; }
+        .awards-carousel .award-card:nth-child(9) { --i: 8; }
+        .awards-carousel .award-card:nth-child(10){ --i: 9; }
+        .awards-carousel .award-card:nth-child(11){ --i: 10; }
+
+        @keyframes awards-marquee {
+            100% {
+                transform: translateX(
+                    calc((var(--items) * (var(--carousel-item-width) + var(--carousel-item-gap))) * -1)
+                );
+            }
+        }
+
+        /* Remove old stack visibility classes impact */
+        .award-card.visible { opacity: 1; }
 
         .award-card::before {
             content: '';
@@ -107,21 +145,20 @@
             z-index: -1;
         }
 
-        .award-card .card-particles {
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            pointer-events: none;
-            border-radius: 15px;
-            overflow: hidden;
-        }
+        /* Remove particle edges */
+        .award-card .card-particles { display: none; }
 
-        .award-card.active {
-            transform: translateZ(50px) scale(1.05);
-            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.9);
-            z-index: 10;
+        /* Disable old stack transforms */
+        .award-card.active,
+        .award-card.prev1,
+        .award-card.prev2,
+        .award-card.next1,
+        .award-card.next2,
+        .award-card.stack-far {
+            transform: none;
+            z-index: auto;
+            filter: none;
+            opacity: 1;
         }
 
         .award-card.prev1 {
@@ -163,12 +200,12 @@
             height: 110px;
             margin: 0 auto 24px;
             border-radius: 10px;
-            box-shadow: 0 12px 40px 0 rgba(255,255,255,0.28), 0 4px 16px rgba(255,255,255,0.15);
             display: flex;
             align-items: center;
             justify-content: center;
             overflow: hidden;
             background: transparent;
+            position: relative;
         }
 
         .award-icon img {
@@ -176,12 +213,61 @@
             height: 100%;
             object-fit: cover; /* Ensures image fills without distortion */
             border-radius: 10px;
-            box-shadow: 0 0 40px 10px rgba(255,255,255,0.38);
+            box-shadow: none;
+            transition: box-shadow 0.3s ease;
+            position: relative;
+            z-index: 1; /* ensure image sits above glow */
         }
 
         .award-card.active .award-icon {
-            box-shadow: 0 12px 40px 0 rgba(255,255,255,0.35), 0 4px 16px rgba(255,255,255,0.18);
             transform: scale(1.05);
+        }
+
+        /* Lumen-style glow starting under the award date */
+        .award-date { position: relative; z-index: 1; }
+        .award-date::before,
+        .award-date::after {
+            content: '';
+            position: absolute;
+            top: 100%; /* start just below the date line */
+            pointer-events: none;
+            opacity: 0; /* hidden until hover */
+            transition: opacity 0.35s ease;
+            z-index: 0;
+        }
+
+        /* Lumen (glow) layer under date */
+        .award-date::before {
+            left: -20%;
+            right: -20%;
+            height: 160%;
+            border-radius: 0 0 50% 50%;
+            filter: blur(16px);
+            background: radial-gradient(ellipse at 50% 0%, rgba(255,255,255,0.6), rgba(255,255,255,0.0) 60%);
+        }
+
+        /* Slit line under date */
+        .award-date::after {
+            left: 18%;
+            right: 18%;
+            height: 1.2rem;
+            background: #121212;
+            border-radius: 0.4rem;
+            box-shadow: 0 0 4px 0 #fff0;
+            transform: perspective(400px) rotateX(-76deg);
+            transition: box-shadow 0.35s ease, background 0.35s ease, opacity 0.35s ease;
+        }
+
+        .awards-carousel .award-card:hover .award-date::before { opacity: 0; }
+        .awards-carousel .award-card:hover .award-date::after { opacity: 0; }
+
+        /* Disable lumen/glow and slit entirely */
+        .award-icon::before,
+        .award-icon::after,
+        .award-date::before,
+        .award-date::after {
+            content: none !important;
+            display: none !important;
         }
 
         .award-date {
@@ -246,24 +332,21 @@
         }
 
         /* Card particle system */
-        .card-particle {
-            position: absolute;
-            width: 2px;
-            height: 2px;
-            background: #fff;
-            border-radius: 50%;
-            opacity: 0.6;
-            animation: cardParticleFloat 3s ease-in-out infinite;
-        }
+        .card-particle { display: none; }
 
-        @keyframes cardParticleFloat {
-            0%, 100% { 
-                opacity: 0.3;
-                transform: scale(0.8);
+        @keyframes cardParticleFloat {}
+
+        @media (prefers-reduced-motion: reduce) {
+            .award-card,
+            .progress-dot {
+                transition: none;
             }
-            50% { 
-                opacity: 0.8;
-                transform: scale(1.2);
+            .card-particle {
+                animation: none;
+            }
+            .awards-container,
+            .award-card {
+                backdrop-filter: none;
             }
         }
 

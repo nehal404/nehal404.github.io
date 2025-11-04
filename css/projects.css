@@ -1,0 +1,219 @@
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    background: #000;
+    color: #fff;
+    font-family: 'Arial', sans-serif;
+    overflow-x: hidden;
+}
+
+.projects {
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: flex-start;
+    padding: 40px 20px;
+}
+
+.title {
+    font-size: 2.2rem;
+    margin-top: 50px;
+    text-align: center;
+}
+
+.carousel-wrapper {
+    flex: 1;
+    width: 100%;
+    display: flex;
+    align-items: center; /* vertical center of carousel */
+    justify-content: center; /* horizontal center */
+    position: relative;
+    padding-top: 60px; /* space for title */
+}
+
+.carousel-wrapper .title {
+    position: absolute;
+    top: 24px;
+    left: 50%;
+    transform: translateX(-50%);
+    margin: 0;
+    text-align: center;
+    width: 100%;
+    pointer-events: none;
+}
+
+/* Horizontal auto-scrolling carousel */
+.carousel {
+    --items: 7;
+    --carousel-duration: 30s;
+    --carousel-width: min(92vw, 1200px);
+    --carousel-item-width: min(18rem, 70vw);
+    --carousel-item-height: calc(var(--carousel-item-width) * 1.333);
+    --carousel-item-gap: 1.2rem;
+    position: relative;
+    width: var(--carousel-width);
+    height: var(--carousel-item-height);
+    overflow: clip;
+}
+
+.carousel[mask] {
+    -webkit-mask-image: linear-gradient(to right, transparent, black 10% 90%, transparent);
+    mask-image: linear-gradient(to right, transparent, black 10% 90%, transparent);
+}
+
+.carousel:hover > article { animation-play-state: paused; }
+
+.carousel > article {
+    position: absolute;
+    top: 0;
+    left: calc(100% + var(--carousel-item-gap));
+    width: var(--carousel-item-width);
+    height: var(--carousel-item-height);
+    will-change: transform;
+    animation-name: projects-marquee;
+    animation-duration: var(--carousel-duration);
+    animation-timing-function: linear;
+    animation-iteration-count: infinite;
+    animation-delay: calc((var(--carousel-duration) / var(--items)) * var(--i) * -1);
+}
+
+.carousel > article:nth-child(1) { --i: 0; }
+.carousel > article:nth-child(2) { --i: 1; }
+.carousel > article:nth-child(3) { --i: 2; }
+.carousel > article:nth-child(4) { --i: 3; }
+.carousel > article:nth-child(5) { --i: 4; }
+.carousel > article:nth-child(6) { --i: 5; }
+.carousel > article:nth-child(7) { --i: 6; }
+
+@keyframes projects-marquee {
+    100% {
+        transform: translateX(
+            calc((var(--items) * (var(--carousel-item-width) + var(--carousel-item-gap))) * -1)
+        );
+    }
+}
+
+/* Luminous card style (hover activates lumen) */
+.card {
+    position: relative;
+    background: rgba(20,20,20,0.15);
+    border: 1px solid rgba(255,255,255,0.08);
+    backdrop-filter: blur(10px);
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.6);
+    width: 100%;
+    height: 100%;
+    border-radius: 1.8rem;
+    color: #fff;
+    padding: 1rem;
+    display: flex;
+    flex-direction: column;
+    justify-content: end;
+    transition: all 0.4s ease-in-out, translate 0.4s ease-out;
+}
+
+.card:hover { translate: 0 -0.2rem; }
+/* removed decorative edge layer */
+
+.light-layer { position: absolute; left: 0; top: 0; height: 100%; width: 100%; transform-style: preserve-3d; perspective: 400px; }
+.light-layer .slit {
+    position: absolute; left: 0; right: 0; top: 0; bottom: 0; margin: auto; width: 64%; height: 1.2rem; transform: rotateX(-76deg);
+    background: #121212; box-shadow: 0 0 4px 0 #fff0; transition: all 0.4s ease-in-out;
+}
+.light-layer .lumen { position: absolute; left: 0; right: 0; top: 0; bottom: 0; margin: auto; width: 100%; height: 100%; pointer-events: none; perspective: 400px; opacity: 0; transition: opacity 0.4s ease-in-out; }
+.light-layer .lumen .min { width: 70%; height: 3rem; background: linear-gradient(#fff0, #fffa); position: absolute; left: 0; right: 0; top: 0; bottom: 2.5rem; margin: auto; transform: rotateX(-42deg); opacity: 0.4; }
+.light-layer .lumen .mid { width: 74%; height: 13rem; background: linear-gradient(#fff0, #fffa); position: absolute; left: 0; right: 0; top: 0; bottom: 10em; margin: auto; transform: rotateX(-42deg); filter: blur(1rem); opacity: 0.8; border-radius: 100% 100% 0 0; }
+.light-layer .lumen .hi  { width: 50%; height: 13rem; background: linear-gradient(#fff0, #fffa); position: absolute; left: 0; right: 0; top: 0; bottom: 12em; margin: auto; transform: rotateX(22deg); filter: blur(1rem); opacity: 0.6; border-radius: 100% 100% 0 0; }
+
+.light-layer .darken { position: absolute; left: 0; right: 0; top: 0; bottom: 0; margin: auto; width: 100%; height: 100%; pointer-events: none; perspective: 400px; transition: opacity 0.4s ease-in-out; opacity: 0.5; }
+.light-layer .darken .sl  { width: 64%; height: 10rem; background: linear-gradient(#000, #0000); position: absolute; left: 0; right: 0; top: 9.6em; bottom: 0; margin: auto; filter: blur(0.2rem); opacity: 0.1; border-radius: 0 0 100% 100%; transform: rotateX(-22deg); }
+.light-layer .darken .ll  { width: 62%; height: 10rem; background: linear-gradient(#000a, #0000); position: absolute; left: 0; right: 0; top: 11em; bottom: 0; margin: auto; filter: blur(0.8rem); opacity: 0.4; border-radius: 0 0 100% 100%; transform: rotateX(22deg); }
+.light-layer .darken .slt { width: 0.5rem; height: 4rem; background: linear-gradient(#0005, #0000); position: absolute; left: 0; right: 11.5rem; top: 3.9em; bottom: 0; margin: auto; opacity: 0.6; border-radius: 0 0 100% 100%; transform: skewY(42deg); }
+.light-layer .darken .srt { width: 0.5rem; height: 4rem; background: linear-gradient(#0005, #0000); position: absolute; right: 0; left: 11.5rem; top: 3.9em; bottom: 0; margin: auto; opacity: 0.6; border-radius: 0 0 100% 100%; transform: skewY(-42deg); }
+
+.card .content .icon { position: absolute; top: 5rem; left: 0; right: 0; margin: auto; width: fit-content; filter: drop-shadow(0 -1.2rem 1px transparent); transition: filter 0.4s ease-in-out; }
+.card .content .bottom h4 { margin: 0 0 1rem 0; font-size: 1.2rem; color: #ccc; }
+.card .content .bottom p { margin: 0; padding-bottom: 0.6rem; color: #fff4; font-size: 0.8rem; font-weight: 100; border-bottom: 1px solid #fff1; max-width: 80%; }
+
+/* Hover: activate lumen */
+.card:hover { box-shadow: 0 20px 60px rgba(0, 0, 0, 0.75); }
+.card:hover .light-layer .slit { background: #fff; box-shadow: 0 0 4px 0 #fff; }
+.card:hover .light-layer .lumen { opacity: 0.5; }
+.card:hover .light-layer .darken { opacity: 0.8; }
+.card:hover .light-layer .darken .sl { opacity: 0.2; }
+.card:hover .light-layer .darken .ll,
+.card:hover .light-layer .darken .slt,
+.card:hover .light-layer .darken .srt { opacity: 1; }
+.card:hover .content .icon { filter: drop-shadow(0 -1.2rem 2px #0003) brightness(1.64); }
+
+.card-title {
+    font-size: 1.1rem;
+    margin-bottom: 8px;
+}
+
+.card-desc {
+    color: #cfcfcf;
+    font-size: 0.95rem;
+    line-height: 1.5;
+    margin-bottom: 12px;
+}
+
+.card-actions {
+    display: flex;
+    gap: 10px;
+}
+
+.btn {
+    display: inline-block;
+    color: #fff;
+    text-decoration: none;
+    background: linear-gradient(135deg, #4f46e5, #7c3aed);
+    border: 1px solid rgba(255,255,255,0.15);
+    border-radius: 10px;
+    padding: 8px 12px;
+    font-size: 0.9rem;
+    transition: transform 0.2s ease;
+}
+
+.btn:hover {
+    transform: translateY(-1px);
+}
+
+@media (max-width: 560px) {
+    .carousel { --carousel-item-gap: 0.6rem; --carousel-duration: 24s; --carousel-width: min(100vw, 800px); }
+
+    .title {
+        font-size: 1.6rem;
+        margin-bottom: 16px;
+    }
+
+    .card { border-radius: 1.2rem; padding: 0.75rem; }
+    .card .content .icon { top: 3.2rem; }
+    .card .content .icon svg { width: 2.4rem; height: 2.4rem; }
+    .card .content .bottom h4 { font-size: 0.95rem; }
+    .card .content .bottom p { font-size: 0.7rem; max-width: 92%; }
+}
+
+@media (max-width: 360px) {
+    .carousel { --carousel-item-gap: 0.5rem; --carousel-duration: 22s; }
+    .card .content .icon { top: 3rem; }
+    .card .content .icon svg { width: 2rem; height: 2rem; }
+    .card .content .bottom h4 { font-size: 0.9rem; }
+    .card .content .bottom p { font-size: 0.65rem; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .card { backdrop-filter: none; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .btn {
+        transition: none;
+    }
+}
+
+

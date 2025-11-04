@@ -319,6 +319,18 @@ body {
     background: rgba(255,255,255,0.3);
 }
 
+@media (prefers-reduced-motion: reduce) {
+    .message {
+        animation: none;
+    }
+    .typing-dot {
+        animation: none;
+    }
+    .chat-window {
+        backdrop-filter: none;
+    }
+}
+
 @media (max-width: 768px) {
     .chat-container {
         padding: 30px 10px 10px;
