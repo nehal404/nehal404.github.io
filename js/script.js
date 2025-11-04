@@ -1,7 +1,7 @@
         class PortfolioManager {
             constructor() {
                 this.currentSection = 'about';
-                this.sections = ['about','chatbot', 'skills', 'awards'];
+                this.sections = ['about','chatbot', 'skills', 'projects', 'awards'];
                 this.navLinks = document.querySelectorAll('.nav-link');
                 this.scrollDots = document.querySelectorAll('.scroll-dot');
                 this.navbar = document.getElementById('navbar');
@@ -15,6 +15,7 @@
                     about: document.getElementById('aboutFrame'),
                     chatbot: document.getElementById('chatbotFrame'),
                     skills: document.getElementById('skillsFrame'),
+                    projects: document.getElementById('projectsFrame'),
                     awards: document.getElementById('awardsFrame')
                 };
                 
@@ -245,6 +246,13 @@
                         framesLoaded++;
                         console.log(`Frame loaded: ${frame.id} (${framesLoaded}/${totalFrames})`);
                         this.setupFrameCommunication(frame);
+
+                        // Hide loading as soon as the first (about) frame is ready
+                        if (frame.id === 'aboutFrame') {
+                            setTimeout(() => {
+                                this.loadingOverlay.classList.add('hidden');
+                            }, 300);
+                        }
                     });
 
                     frame.addEventListener('error', () => {
@@ -271,25 +279,18 @@
                     checkCount++;
                     
                     try {
-                        const aboutLoaded = this.frames.about.contentDocument !== null;
-                        const chatbotLoaded = this.frames.chatbot.contentDocument !== null;
-                        const skillsLoaded = this.frames.skills.contentDocument !== null;
-                        const awardsLoaded = this.frames.awards.contentDocument !== null;
-                        
-                        if ((aboutLoaded && chatbotLoaded && skillsLoaded && awardsLoaded) || checkCount > 20) {
-                            setTimeout(() => {
-                                this.loadingOverlay.classList.add('hidden');
-                            }, 800);
+                        const aboutLoaded = !!this.frames.about && this.frames.about.contentDocument !== null;
+                        // Hide early when the visible section is ready, or fallback after ~2s
+                        if (aboutLoaded || checkCount > 10) {
+                            this.loadingOverlay.classList.add('hidden');
                             return;
                         }
-                    } catch (e) {
-                        // Frames might be loading from different origins
-                    }
+                    } catch (e) {}
                     
                     setTimeout(checkFrames, 200);
                 };
 
-                setTimeout(checkFrames, 500);
+                setTimeout(checkFrames, 300);
             }
 
             // Public methods
