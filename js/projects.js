@@ -71,14 +71,27 @@ document.addEventListener('DOMContentLoaded', () => {
     // Mobile tap to pause/resume the projects carousel
     const isTouch = window.matchMedia && window.matchMedia('(hover: none)').matches;
     if (isTouch && carousel) {
-        const togglePause = (e) => {
-            // Ignore taps on interactive elements
-            const interactive = e.target.closest('a, button, .btn');
-            if (interactive) return;
-            carousel.classList.toggle('paused');
+        const handleTap = (e) => {
+            const anchor = e.target.closest('a');
+            const isPaused = carousel.classList.contains('paused');
+
+            if (anchor && !isPaused) {
+                // First tap: pause and prevent navigation
+                e.preventDefault();
+                carousel.classList.add('paused');
+                return;
+            }
+
+            if (!anchor) {
+                // Tap on non-interactive area toggles pause
+                carousel.classList.toggle('paused');
+            }
+            // If anchor and paused: allow navigation (no preventDefault)
         };
-        carousel.addEventListener('click', togglePause);
-        carousel.addEventListener('touchend', togglePause, { passive: true });
+
+        // Use both click and touchstart for broader compatibility
+        carousel.addEventListener('click', handleTap, { capture: true });
+        carousel.addEventListener('touchstart', handleTap, { passive: false, capture: true });
     }
 });
 

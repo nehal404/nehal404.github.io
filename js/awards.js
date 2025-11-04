@@ -9,12 +9,24 @@ document.addEventListener('DOMContentLoaded', () => {
     const isTouch = window.matchMedia && window.matchMedia('(hover: none)').matches;
     const carousel = document.querySelector('.awards-carousel');
     if (isTouch && carousel) {
-        const togglePause = (e) => {
-            const interactive = e.target.closest('a, button');
-            if (interactive) return;
-            carousel.classList.toggle('paused');
+        const handleTap = (e) => {
+            const anchor = e.target.closest('a');
+            const isPaused = carousel.classList.contains('paused');
+
+            if (anchor && !isPaused) {
+                // First tap: pause and prevent navigation
+                e.preventDefault();
+                carousel.classList.add('paused');
+                return;
+            }
+
+            if (!anchor) {
+                carousel.classList.toggle('paused');
+            }
+            // If anchor and paused: allow navigation
         };
-        carousel.addEventListener('click', togglePause);
-        carousel.addEventListener('touchend', togglePause, { passive: true });
+
+        carousel.addEventListener('click', handleTap, { capture: true });
+        carousel.addEventListener('touchstart', handleTap, { passive: false, capture: true });
     }
 });
