@@ -136,8 +136,10 @@ body {
 .light-layer .darken .srt { width: 0.5rem; height: 4rem; background: linear-gradient(#0005, #0000); position: absolute; right: 0; left: 11.5rem; top: 3.9em; bottom: 0; margin: auto; opacity: 0.6; border-radius: 0 0 100% 100%; transform: skewY(-42deg); }
 
 .card .content .icon { position: absolute; top: 5rem; left: 0; right: 0; margin: auto; width: fit-content; filter: drop-shadow(0 -1.2rem 1px transparent); transition: filter 0.4s ease-in-out; }
+.card .content { text-align: center; }
 .card .content .bottom h4 { margin: 0 0 1rem 0; font-size: 1.2rem; color: #ccc; }
-.card .content .bottom p { margin: 0; padding-bottom: 0.6rem; color: #fff4; font-size: 0.8rem; font-weight: 100; border-bottom: 1px solid #fff1; max-width: 80%; }
+.card .content .bottom p { margin: 0 auto; padding-bottom: 0.6rem; color: #fff4; font-size: 0.8rem; font-weight: 100; border-bottom: 1px solid #fff1; max-width: 80%; }
+.card .content .card-actions { justify-content: center; }
 
 /* Hover: activate lumen */
 .card:hover { box-shadow: 0 20px 60px rgba(0, 0, 0, 0.75); }
@@ -195,7 +197,7 @@ body {
     .card .content .icon { top: 3.2rem; }
     .card .content .icon svg { width: 2.4rem; height: 2.4rem; }
     .card .content .bottom h4 { font-size: 0.95rem; }
-    .card .content .bottom p { font-size: 0.7rem; max-width: 92%; }
+    .card .content .bottom p { font-size: 0.7rem; max-width: 92%; margin: 0 auto; }
 }
 
 @media (max-width: 360px) {
