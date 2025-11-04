@@ -3,6 +3,83 @@ document.addEventListener('DOMContentLoaded', () => {
     try {
         window.parent.postMessage({ type: 'FRAME_READY', frame: 'projects' }, '*');
     } catch (e) {}
+
+    const modal = document.getElementById('videoModal');
+    const videoEl = document.getElementById('projectVideo');
+    const watchButtons = Array.from(document.querySelectorAll('.btn-watch'));
+    const carousel = document.querySelector('.carousel');
+    const modalCloseEls = Array.from(document.querySelectorAll('[data-close]'));
+    const modalContainer = modal?.querySelector('.video-container');
+
+    function openModal(src) {
+        if (!modal || !videoEl) return;
+        videoEl.src = src;
+        videoEl.currentTime = 0;
+        modal.classList.add('open');
+        modal.setAttribute('aria-hidden', 'false');
+        // Attempt autoplay (may be muted requirement on some browsers)
+        const playPromise = videoEl.play();
+        if (playPromise && typeof playPromise.catch === 'function') {
+            playPromise.catch(() => {/* ignore autoplay block */});
+        }
+    }
+
+    function closeModal() {
+        if (!modal || !videoEl) return;
+        videoEl.pause();
+        videoEl.removeAttribute('src');
+        videoEl.load();
+        modal.classList.remove('open');
+        modal.setAttribute('aria-hidden', 'true');
+    }
+
+    watchButtons.forEach(btn => {
+        btn.addEventListener('click', (e) => {
+            e.preventDefault();
+            const src = btn.getAttribute('data-video');
+            if (src) openModal(src);
+        });
+    });
+
+    // Close handlers
+    modal?.addEventListener('click', (e) => {
+        const target = e.target;
+        if (!(target instanceof Element)) return;
+        if (target.hasAttribute('data-close') || target === modal) {
+            closeModal();
+        }
+    });
+
+    // Direct close handlers to be robust across nested elements
+    modalCloseEls.forEach(el => {
+        el.addEventListener('click', (e) => {
+            e.preventDefault();
+            e.stopPropagation();
+            closeModal();
+        });
+    });
+
+    // Prevent clicks inside container from closing the modal
+    modalContainer?.addEventListener('click', (e) => {
+        e.stopPropagation();
+    });
+
+    document.addEventListener('keydown', (e) => {
+        if (e.key === 'Escape') closeModal();
+    });
+
+    // Mobile tap to pause/resume the projects carousel
+    const isTouch = window.matchMedia && window.matchMedia('(hover: none)').matches;
+    if (isTouch && carousel) {
+        const togglePause = (e) => {
+            // Ignore taps on interactive elements
+            const interactive = e.target.closest('a, button, .btn');
+            if (interactive) return;
+            carousel.classList.toggle('paused');
+        };
+        carousel.addEventListener('click', togglePause);
+        carousel.addEventListener('touchend', togglePause, { passive: true });
+    }
 });
 
 

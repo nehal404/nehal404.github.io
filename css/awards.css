@@ -82,7 +82,14 @@
             mask-image: linear-gradient(to right, transparent, black 10% 90%, transparent);
         }
 
-        .awards-carousel:hover > .award-card { animation-play-state: paused; }
+/* Tap pause/resume support */
+.awards-carousel.paused > .award-card { animation-play-state: paused; }
+@media (hover: hover) and (pointer: fine) {
+    .awards-carousel:hover > .award-card { animation-play-state: paused; }
+}
+@media (hover: none) {
+    .awards-carousel:hover > .award-card { animation-play-state: running; }
+}
 
         .awards-carousel .award-card {
             position: absolute;

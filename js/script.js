@@ -1,7 +1,7 @@
         class PortfolioManager {
             constructor() {
                 this.currentSection = 'about';
-                this.sections = ['about','chatbot', 'skills', 'projects', 'awards'];
+                this.sections = ['about','projects','skills','awards','chatbot'];
                 this.navLinks = document.querySelectorAll('.nav-link');
                 this.scrollDots = document.querySelectorAll('.scroll-dot');
                 this.navbar = document.getElementById('navbar');

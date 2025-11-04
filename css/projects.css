@@ -49,7 +49,7 @@ body {
 
 /* Horizontal auto-scrolling carousel */
 .carousel {
-    --items: 7;
+    --items: 6;
     --carousel-duration: 30s;
     --carousel-width: min(92vw, 1200px);
     --carousel-item-width: min(18rem, 70vw);
@@ -66,7 +66,15 @@ body {
     mask-image: linear-gradient(to right, transparent, black 10% 90%, transparent);
 }
 
-.carousel:hover > article { animation-play-state: paused; }
+/* Tap pause/resume support */
+.carousel.paused > article { animation-play-state: paused; }
+
+@media (hover: hover) and (pointer: fine) {
+    .carousel:hover > article { animation-play-state: paused; }
+}
+@media (hover: none) {
+    .carousel:hover > article { animation-play-state: running; }
+}
 
 .carousel > article {
     position: absolute;
@@ -116,6 +124,11 @@ body {
     transition: all 0.4s ease-in-out, translate 0.4s ease-out;
 }
 
+.card .card-link { position: absolute; inset: 0; z-index: 1; }
+.card, .card * { cursor: default; }
+.card:hover { cursor: pointer; }
+.card .content, .card .card-actions, .card .icon { position: relative; z-index: 2; }
+
 .card:hover { translate: 0 -0.2rem; }
 /* removed decorative edge layer */
 
@@ -135,7 +148,8 @@ body {
 .light-layer .darken .slt { width: 0.5rem; height: 4rem; background: linear-gradient(#0005, #0000); position: absolute; left: 0; right: 11.5rem; top: 3.9em; bottom: 0; margin: auto; opacity: 0.6; border-radius: 0 0 100% 100%; transform: skewY(42deg); }
 .light-layer .darken .srt { width: 0.5rem; height: 4rem; background: linear-gradient(#0005, #0000); position: absolute; right: 0; left: 11.5rem; top: 3.9em; bottom: 0; margin: auto; opacity: 0.6; border-radius: 0 0 100% 100%; transform: skewY(-42deg); }
 
-.card .content .icon { position: absolute; top: 5rem; left: 0; right: 0; margin: auto; width: fit-content; filter: drop-shadow(0 -1.2rem 1px transparent); transition: filter 0.4s ease-in-out; }
+.card .content .icon { position: relative; top: 0; left: 0; right: 0; margin: 0 auto 0.8rem; width: 100%; filter: drop-shadow(0 -1.2rem 1px transparent); transition: filter 0.4s ease-in-out; text-align: center; }
+.card .content .icon img { width: 88%; height: auto; object-fit: contain; border-radius: 0.6rem; display: inline-block; }
 .card .content { text-align: center; }
 .card .content .bottom h4 { margin: 0 0 1rem 0; font-size: 1.2rem; color: #ccc; }
 .card .content .bottom p { margin: 0 auto; padding-bottom: 0.6rem; color: #fff4; font-size: 0.8rem; font-weight: 100; border-bottom: 1px solid #fff1; max-width: 80%; }
@@ -194,16 +208,16 @@ body {
     }
 
     .card { border-radius: 1.2rem; padding: 0.75rem; }
-    .card .content .icon { top: 3.2rem; }
-    .card .content .icon svg { width: 2.4rem; height: 2.4rem; }
+    .card .content .icon { top: 0; margin-bottom: 0.6rem; }
+    .card .content .icon img { width: 94%; height: auto; }
     .card .content .bottom h4 { font-size: 0.95rem; }
     .card .content .bottom p { font-size: 0.7rem; max-width: 92%; margin: 0 auto; }
 }
 
 @media (max-width: 360px) {
     .carousel { --carousel-item-gap: 0.5rem; --carousel-duration: 22s; }
-    .card .content .icon { top: 3rem; }
-    .card .content .icon svg { width: 2rem; height: 2rem; }
+    .card .content .icon { top: 0; margin-bottom: 0.5rem; }
+    .card .content .icon img { width: 96%; height: auto; }
     .card .content .bottom h4 { font-size: 0.9rem; }
     .card .content .bottom p { font-size: 0.65rem; }
 }
@@ -219,3 +233,14 @@ body {
 }
 
 
+/* Video Modal */
+.video-modal { position: fixed; inset: 0; display: none; align-items: center; justify-content: center; z-index: 9999; }
+.video-modal.open { display: flex; }
+.video-modal .video-backdrop { position: absolute; inset: 0; background: rgba(0,0,0,0.7); }
+.video-modal .video-container { position: relative; width: min(92vw, 960px); height: auto; background: #0b0b0b; border: 1px solid rgba(255,255,255,0.08); border-radius: 12px; box-shadow: 0 10px 40px rgba(0,0,0,0.6); padding: 12px; }
+.video-modal video { width: 100%; height: auto; display: block; border-radius: 8px; background: #000; }
+.video-modal .video-close { position: absolute; top: 8px; right: 8px; background: linear-gradient(135deg, #4f46e5, #7c3aed); color: #fff; border: 0; border-radius: 8px; padding: 6px 10px; font-size: 14px; cursor: pointer; z-index: 2; }
+
+@media (max-width: 560px) {
+    .video-modal .video-container { width: min(96vw, 640px); padding: 8px; }
+}
